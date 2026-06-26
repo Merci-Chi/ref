@@ -1,0 +1,2108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Steady Hand Operations | Concern Brackets</title>
+    <style>
+      :root {
+        --ink: #162236;
+        --muted: #607086;
+        --navy: #102a43;
+        --gold: #b9822e;
+        --sage: #7b8f76;
+        --blue: #6d8ea8;
+        --rose: #b77a7a;
+        --plum: #7c6a91;
+        --teal: #5f8f8b;
+        --brick: #aa6b4f;
+        --line: #ddd3c4;
+        --shadow: 0 16px 34px rgba(21, 34, 56, 0.12);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(185, 130, 46, 0.2),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(109, 142, 168, 0.16),
+            transparent 32%
+          ),
+          linear-gradient(135deg, #fbf8f1 0%, #f2ecdf 100%);
+        color: var(--ink);
+      }
+      .wrap {
+        height: 100vh;
+        width: min(1500px, calc(100vw - 20px));
+        margin: 0 auto;
+        padding: 10px 0;
+      }
+      .call-grid {
+        height: calc(100vh - 20px);
+        display: grid;
+        grid-template-columns: clamp(210px, 18vw, 285px) minmax(0, 1fr);
+        gap: 10px;
+        align-items: stretch;
+      }
+      .panel,
+      .active-category,
+      .script-card {
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(221, 211, 196, 0.95);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+        min-height: 0;
+      }
+      .panel {
+        padding: clamp(9px, 1vw, 14px);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+      }
+      .panel-title {
+        margin: 0 0 9px;
+        color: #80633c;
+        font-size: clamp(10px, 0.8vw, 12px);
+        font-weight: 950;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+      .category-list {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: repeat(var(--category-count), minmax(0, 1fr));
+        gap: clamp(4px, 0.5vw, 7px);
+        overflow: hidden;
+      }
+      button {
+        font: inherit;
+      }
+      .cat-btn {
+        width: 100%;
+        min-height: 0;
+        display: grid;
+        grid-template-columns: clamp(26px, 2.3vw, 34px) 1fr auto;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        background: #fff;
+        padding: 5px 7px;
+        color: var(--ink);
+        cursor: pointer;
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease,
+          border-color 0.16s ease;
+        text-align: left;
+      }
+      .cat-btn:hover {
+        transform: none;
+        border-color: rgba(185, 130, 46, 0.75);
+        box-shadow: 0 8px 16px rgba(21, 34, 56, 0.1);
+      }
+      .cat-btn.active {
+        transform: none;
+        background: #fff4dd;
+        border: 1px solid var(--gold);
+        outline: 2px solid var(--gold);
+        outline-offset: -2px;
+        box-shadow:
+          0 8px 16px rgba(185, 130, 46, 0.22),
+          inset 0 0 0 2px #ffffff;
+      }
+      .cat-btn.active .word {
+        color: #7a5119;
+      }
+      .cat-btn.active .arrow {
+        color: var(--gold);
+      }
+      .icon {
+        width: clamp(26px, 2.3vw, 34px);
+        height: clamp(26px, 2.3vw, 34px);
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        color: #fff;
+        font-weight: 950;
+        font-size: clamp(13px, 1.05vw, 16px);
+      }
+      .word {
+        font-weight: 950;
+        font-size: clamp(12px, 1.05vw, 15px);
+        color: var(--navy);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .arrow {
+        color: #9a8b78;
+        font-weight: 900;
+      }
+      .main {
+        min-height: 0;
+        display: grid;
+        grid-template-rows: 2fr 1fr;
+        gap: 10px;
+        overflow: hidden;
+      }
+      .active-category {
+        padding: clamp(10px, 1.15vw, 16px);
+        display: grid;
+        overflow: hidden;
+      }
+      .category-head,
+      .category-head h2,
+      .summary,
+      .mini-tag {
+        display: none !important;
+      }
+      .bracket {
+        min-height: 0;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: clamp(8px, 1vw, 14px);
+      }
+      .lane {
+        min-height: 0;
+        height: 100%;
+        border: 1px solid var(--line);
+        border-radius: 19px;
+        padding: clamp(8px, 0.9vw, 12px);
+        background: rgba(252, 251, 248, 0.96);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+      }
+      .lane-label {
+        margin: 0 0 7px;
+        color: #8a7662;
+        font-size: clamp(9px, 0.75vw, 11px);
+        font-weight: 950;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+      .choice-grid {
+        min-height: 0;
+        display: grid;
+        align-content: start;
+        gap: clamp(5px, 0.62vw, 8px);
+        overflow: hidden;
+      }
+      .choice {
+        border: 1px solid #e7dece;
+        border-radius: 15px;
+        background: #fff;
+        padding: clamp(6px, 0.7vw, 9px);
+        cursor: pointer;
+        text-align: left;
+        transition:
+          transform 0.14s ease,
+          box-shadow 0.14s ease,
+          border-color 0.14s ease;
+        min-height: 0;
+      }
+      .choice:hover {
+        transform: none;
+        box-shadow: 0 7px 14px rgba(21, 34, 56, 0.1);
+        border-color: var(--gold);
+      }
+      .choice.selected {
+        transform: none;
+        background: #fff4dd;
+        border: 1px solid var(--gold);
+        outline: 2px solid var(--gold);
+        outline-offset: -2px;
+        box-shadow:
+          0 8px 16px rgba(185, 130, 46, 0.22),
+          inset 0 0 0 2px #ffffff;
+      }
+      .choice.selected .choice-word,
+      .choice.selected p {
+        color: #7a5119;
+      }
+      .choice.selected .choice-word span:last-child {
+        color: var(--gold);
+      }
+      .choice-word {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 7px;
+        font-size: clamp(13px, 1.25vw, 18px);
+        line-height: 1.02;
+        font-weight: 950;
+        color: var(--navy);
+      }
+      .choice-word span:first-child {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .choice-word span:last-child {
+        color: #b79b78;
+        font-size: clamp(12px, 1vw, 15px);
+      }
+      .choice p {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: clamp(10px, 0.78vw, 12px);
+        line-height: 1.15;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .empty {
+        height: 100%;
+        min-height: 0;
+        display: grid;
+        place-items: center;
+        border: 1px dashed #d8cdbb;
+        border-radius: 16px;
+        color: #978977;
+        text-align: center;
+        padding: clamp(8px, 1vw, 14px);
+        font-size: clamp(11px, 0.9vw, 13px);
+        line-height: 1.25;
+        background: rgba(255, 255, 255, 0.55);
+      }
+      .script-card {
+        padding: clamp(10px, 1.1vw, 16px);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        overflow: hidden;
+      }
+      .talk {
+        min-height: 0;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        padding: clamp(10px, 1.05vw, 15px);
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+      .talk h3 {
+        margin: 0 0 8px;
+        color: var(--navy);
+        font-size: clamp(18px, 1.8vw, 28px);
+        letter-spacing: -0.03em;
+      }
+      .talk p {
+        margin: 0;
+        color: #324157;
+        font-size: clamp(14px, 1.35vw, 20px);
+        line-height: 1.35;
+        overflow: hidden;
+      }
+      #fitText,
+      #microText {
+        display: none;
+      }
+      .c-cost {
+        background: var(--gold);
+      }
+      .c-time {
+        background: var(--blue);
+      }
+      .c-trust {
+        background: var(--sage);
+      }
+      .c-scope {
+        background: var(--rose);
+      }
+      .c-tech {
+        background: var(--plum);
+      }
+      .c-ready {
+        background: var(--navy);
+      }
+      .c-roi {
+        background: var(--teal);
+      }
+      .c-capacity {
+        background: #8f805f;
+      }
+      .c-decision {
+        background: var(--brick);
+      }
+      @media (max-width: 900px) {
+        html,
+        body {
+          overflow: auto;
+          height: auto;
+        }
+        .wrap {
+          height: auto;
+          width: min(100% - 20px, 1500px);
+          padding: 10px 0;
+        }
+        .call-grid {
+          height: auto;
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          overflow: visible;
+        }
+        .category-list {
+          grid-template-rows: none;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .main {
+          grid-template-rows: auto auto;
+        }
+        .active-category {
+          min-height: 560px;
+        }
+        .bracket {
+          grid-template-columns: 1fr;
+        }
+        .script-card {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media print {
+        html,
+        body {
+          overflow: visible;
+          height: auto;
+          background: #fff;
+        }
+        .wrap {
+          width: 100%;
+          height: auto;
+          padding: 10px;
+        }
+        .call-grid,
+        .bracket,
+        .script-card {
+          height: auto;
+          grid-template-columns: 1fr;
+        }
+        .panel,
+        .active-category,
+        .script-card {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="call-grid">
+        <aside class="panel">
+          <p class="panel-title">Categories</p>
+          <div class="category-list" id="categoryList"></div>
+        </aside>
+
+        <main class="main">
+          <section class="active-category">
+            <div class="category-head">
+              <h2 id="categoryTitle">Time</h2>
+              <p class="summary" id="categorySummary"></p>
+              <span class="mini-tag" id="categoryTag"></span>
+            </div>
+
+            <div class="bracket">
+              <div class="lane">
+                <p class="lane-label">Concern</p>
+                <div class="choice-grid" id="levelOne"></div>
+              </div>
+              <div class="lane">
+                <p class="lane-label">Deeper</p>
+                <div class="choice-grid" id="levelTwo"></div>
+              </div>
+              <div class="lane">
+                <p class="lane-label">More</p>
+                <div class="choice-grid" id="levelThree"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="script-card">
+            <div class="talk">
+              <h3>Say</h3>
+              <p id="sayText"></p>
+            </div>
+            <div class="talk">
+              <h3>Ask</h3>
+              <p id="askText"></p>
+              <p id="fitText"></p>
+              <p id="microText"></p>
+            </div>
+          </section>
+        </main>
+      </section>
+    </div>
+
+    <script>
+      const data = {
+        Time: {
+          icon: "⏱",
+          color: "c-time",
+          levels: [
+            {
+              word: "Overwhelmed",
+              summary: "Everything feels urgent and scattered.",
+              say: "That makes sense. We can turn the pile into a simple order of operations instead of adding more pressure.",
+              ask: "What feels most out of control right now?",
+              fit: "Audit or operations support.",
+              children: [
+                {
+                  word: "Inbox",
+                  summary: "Messages pile up or replies are late.",
+                  say: "Email can take over fast. We can sort, flag, draft, and build a reply rhythm.",
+                  ask: "Are you missing messages or spending too much time sorting?",
+                  fit: "Inbox cleanup and response drafts.",
+                },
+                {
+                  word: "Follow-up",
+                  summary: "Leads or check-ins keep slipping.",
+                  say: "Follow-up is an easy place to lose money quietly. We can make it visible and repeatable.",
+                  ask: "Where are follow-ups tracked right now?",
+                  fit: "Lead tracker or CRM cleanup.",
+                },
+                {
+                  word: "Scheduling",
+                  summary: "Calendar coordination eats the day.",
+                  say: "Scheduling should not drain your week. We can clean up reminders, appointments, and calendar flow.",
+                  ask: "What causes the most scheduling friction?",
+                  fit: "Calendar support.",
+                },
+                {
+                  word: "Files",
+                  summary: "You waste time looking for things.",
+                  say: "A simple file structure can save time immediately. We can create one clear home for key documents.",
+                  ask: "What file do you search for the most?",
+                  fit: "File organization project.",
+                },
+              ],
+            },
+            {
+              word: "Too Busy",
+              summary: "Growth is outpacing the backend.",
+              say: "That is a good problem, but it still needs structure before it turns into burnout.",
+              ask: "What changed recently that made things heavier?",
+              fit: "Client operations or systems setup.",
+              children: [
+                {
+                  word: "More Clients",
+                  summary: "More details, messages, and handoffs.",
+                  say: "As client volume grows, the client path needs a cleaner flow.",
+                  ask: "Where does the client process get messy first?",
+                  fit: "Client workflow.",
+                },
+                {
+                  word: "Repeat Work",
+                  summary: "You rebuild the same things often.",
+                  say: "Repeating the same task is usually a sign the business needs a system.",
+                  ask: "What do you keep recreating?",
+                  fit: "Templates or SOPs.",
+                },
+                {
+                  word: "No Backup",
+                  summary: "Everything depends on you.",
+                  say: "When every detail lives in your head, the business becomes harder to hand off.",
+                  ask: "What would be hard for someone else to pick up?",
+                  fit: "Documentation and SOPs.",
+                },
+              ],
+            },
+            {
+              word: "Behind",
+              summary: "Tasks are late or always almost late.",
+              say: "Being behind is stressful, but it is fixable when we separate urgent tasks from repeatable systems.",
+              ask: "What is overdue or almost overdue right now?",
+              fit: "Priority cleanup.",
+              children: [
+                {
+                  word: "Deadlines",
+                  summary: "Dates and deliverables are slipping.",
+                  say: "We can map the deadlines and create a simple checkpoint system.",
+                  ask: "Which deadline matters most this week?",
+                  fit: "Project coordination.",
+                },
+                {
+                  word: "Client Replies",
+                  summary: "People wait too long for updates.",
+                  say: "A reply rhythm can calm clients and protect trust.",
+                  ask: "Who is waiting on you right now?",
+                  fit: "Client communication support.",
+                },
+                {
+                  word: "Admin Backlog",
+                  summary: "Small tasks keep stacking up.",
+                  say: "The backlog usually needs a focused cleanup plus a maintenance rhythm.",
+                  ask: "What admin task has been sitting the longest?",
+                  fit: "Admin cleanup.",
+                },
+              ],
+            },
+            {
+              word: "Mental Load",
+              summary: "Too much is stored in your head.",
+              say: "That is exhausting. We can move the details out of your head and into a system you can trust.",
+              ask: "What are you afraid you will forget?",
+              fit: "Tracker, checklist, or SOP setup.",
+              children: [
+                {
+                  word: "Reminders",
+                  summary: "You rely on memory too much.",
+                  say: "We can build reminders so your brain is not the whole system.",
+                  ask: "What needs a reminder every week?",
+                  fit: "Reminder workflow.",
+                },
+                {
+                  word: "Approvals",
+                  summary: "Decisions pile up on you.",
+                  say: "We can create approval points so decisions are easier and less scattered.",
+                  ask: "What do people need your approval for most?",
+                  fit: "Approval workflow.",
+                },
+                {
+                  word: "Details",
+                  summary: "Tiny details are easy to miss.",
+                  say: "Checklists protect the details without making the work heavier.",
+                  ask: "Which details matter most not to miss?",
+                  fit: "Checklist setup.",
+                },
+              ],
+            },
+            {
+              word: "Distractions",
+              summary: "Admin interrupts client or sales work.",
+              say: "The goal is to protect your focus by moving interruptions into a cleaner support flow.",
+              ask: "What interrupts you most during the day?",
+              fit: "Flexible support.",
+              children: [
+                {
+                  word: "Notifications",
+                  summary: "Too many pings pull attention.",
+                  say: "We can create a review rhythm so everything does not need an instant reaction.",
+                  ask: "Which tool interrupts you most?",
+                  fit: "Communication workflow.",
+                },
+                {
+                  word: "Quick Tasks",
+                  summary: "Small things steal big focus.",
+                  say: "Small tasks add up fast. We can batch and systemize them.",
+                  ask: "Which quick task shows up constantly?",
+                  fit: "Admin batching.",
+                },
+                {
+                  word: "Context Switching",
+                  summary: "You jump between too many tools.",
+                  say: "Switching tools creates hidden time loss. We can simplify the flow.",
+                  ask: "Which tools do you jump between most?",
+                  fit: "Systems cleanup.",
+                },
+              ],
+            },
+          ],
+        },
+        Cost: {
+          icon: "$",
+          color: "c-cost",
+          levels: [
+            {
+              word: "Budget",
+              summary: "They are not sure they can afford help.",
+              say: "That is fair. We can start with the smallest useful piece instead of a big commitment.",
+              ask: "What task is costing you the most time every week?",
+              fit: "Starter project or light support.",
+              children: [
+                {
+                  word: "Start Small",
+                  summary: "They want low pressure.",
+                  say: "We can keep it lean and focus on one clear cleanup first.",
+                  ask: "Would one-time cleanup or light monthly support feel easier?",
+                  fit: "Starter project.",
+                },
+                {
+                  word: "Payment Timing",
+                  summary: "Cash flow matters right now.",
+                  say: "We can align the start with a clean, realistic timeline so it does not create stress.",
+                  ask: "Is timing the bigger issue or the total cost?",
+                  fit: "Later start or smaller scope.",
+                },
+                {
+                  word: "Compare Options",
+                  summary: "They need package clarity.",
+                  say: "I can compare the options based on what you need solved first.",
+                  ask: "Do you want the lightest option or the most complete support?",
+                  fit: "Package recommendation.",
+                },
+              ],
+            },
+            {
+              word: "Worth It",
+              summary: "They need to understand the return.",
+              say: "The question is what disorganization is already costing through missed follow-up, repeated work, and delayed replies.",
+              ask: "What has slipped through the cracks recently?",
+              fit: "Tie to time saved and missed opportunities.",
+              children: [
+                {
+                  word: "Time Back",
+                  summary: "They value saved hours.",
+                  say: "Even a few hours back can create room for sales, clients, planning, or rest.",
+                  ask: "What would you do with five extra hours this month?",
+                  fit: "Time-saving project.",
+                },
+                {
+                  word: "Lost Leads",
+                  summary: "Revenue may be leaking.",
+                  say: "Cleaner follow-up protects opportunities that might otherwise go cold.",
+                  ask: "Have any leads gone quiet recently?",
+                  fit: "Follow-up system.",
+                },
+                {
+                  word: "Fewer Mistakes",
+                  summary: "Errors are costing energy.",
+                  say: "A repeatable process reduces costly missed details.",
+                  ask: "What mistake would be expensive to repeat?",
+                  fit: "Checklist or SOP.",
+                },
+              ],
+            },
+            {
+              word: "DIY Cost",
+              summary: "They think doing it alone is cheaper.",
+              say: "Doing it yourself can look cheaper, but it may be costing focus, speed, and follow-through.",
+              ask: "What are you handling yourself that you should not still be carrying?",
+              fit: "Delegation starter.",
+              children: [
+                {
+                  word: "Owner Time",
+                  summary: "Their hours are the bottleneck.",
+                  say: "Your time should be spent on the work only you can do.",
+                  ask: "What task pulls you away from clients or sales?",
+                  fit: "Admin delegation.",
+                },
+                {
+                  word: "Learning Curve",
+                  summary: "They lose time figuring tools out.",
+                  say: "Sometimes the hidden cost is the time spent trying to build the system yourself.",
+                  ask: "What tool or process keeps slowing you down?",
+                  fit: "Systems setup.",
+                },
+                {
+                  word: "Backlog Cost",
+                  summary: "Unfinished work has a price.",
+                  say: "A backlog can quietly slow revenue and client experience.",
+                  ask: "What backlog item would feel best to clear first?",
+                  fit: "Backlog cleanup.",
+                },
+              ],
+            },
+            {
+              word: "Scope Creep",
+              summary: "They fear costs will grow.",
+              say: "We can define the starting scope clearly so there are no surprises.",
+              ask: "Would a fixed first project feel safer?",
+              fit: "Fixed-scope cleanup.",
+              children: [
+                {
+                  word: "Clear Deliverables",
+                  summary: "They want boundaries.",
+                  say: "I can name exactly what is included before we begin.",
+                  ask: "Which result do you need to see first?",
+                  fit: "Defined deliverables.",
+                },
+                {
+                  word: "Approval First",
+                  summary: "They want control.",
+                  say: "Nothing has to expand without your approval.",
+                  ask: "Do you want approval before extra work is added?",
+                  fit: "Approval process.",
+                },
+                {
+                  word: "Pause Option",
+                  summary: "They want flexibility.",
+                  say: "We can start in a way that gives you room to pause or adjust.",
+                  ask: "Would monthly or project-based support feel better?",
+                  fit: "Flexible option.",
+                },
+              ],
+            },
+          ],
+        },
+        ROI: {
+          icon: "↗",
+          color: "c-roi",
+          levels: [
+            {
+              word: "Need Proof",
+              summary: "They want to see the payoff.",
+              say: "That is smart. Value usually shows up in saved hours, faster replies, cleaner follow-up, and fewer missed details.",
+              ask: "Which payoff matters most right now?",
+              fit: "Audit or priority cleanup.",
+              children: [
+                {
+                  word: "Save Time",
+                  summary: "They need hours back.",
+                  say: "We can start with the task interrupting your week the most.",
+                  ask: "What steals the most time weekly?",
+                  fit: "Time-saving cleanup.",
+                },
+                {
+                  word: "Protect Leads",
+                  summary: "They need revenue follow-through.",
+                  say: "A visible follow-up system helps keep leads from going cold.",
+                  ask: "How are leads tracked now?",
+                  fit: "Lead tracker.",
+                },
+                {
+                  word: "Smoother Clients",
+                  summary: "They want better service.",
+                  say: "Cleaner backend systems help clients feel supported faster.",
+                  ask: "Where do clients wait the longest?",
+                  fit: "Client operations.",
+                },
+              ],
+            },
+            {
+              word: "Hidden Losses",
+              summary: "They may not see what chaos costs.",
+              say: "The cost is often hidden in late replies, repeated explanations, messy files, and forgotten follow-ups.",
+              ask: "Where do small misses happen most often?",
+              fit: "Organization audit.",
+              children: [
+                {
+                  word: "Late Replies",
+                  summary: "Slow responses affect trust.",
+                  say: "Faster replies can protect both client trust and sales momentum.",
+                  ask: "Who usually waits for replies?",
+                  fit: "Inbox rhythm.",
+                },
+                {
+                  word: "Rework",
+                  summary: "The same work gets repeated.",
+                  say: "Templates can reduce how often you start from scratch.",
+                  ask: "What do you rewrite often?",
+                  fit: "Templates.",
+                },
+                {
+                  word: "Missed Details",
+                  summary: "Errors create cleanup work.",
+                  say: "A checklist can catch details before they turn into problems.",
+                  ask: "What detail is most painful to miss?",
+                  fit: "Checklist.",
+                },
+              ],
+            },
+            {
+              word: "Priority",
+              summary: "They do not know what comes first.",
+              say: "We do not have to fix everything. We choose the area with the fastest useful return.",
+              ask: "Do you want the fastest relief or the biggest long-term improvement?",
+              fit: "Recommendation callout.",
+              children: [
+                {
+                  word: "Fast Relief",
+                  summary: "They need immediate pressure off.",
+                  say: "Then we start with the loudest pain point first.",
+                  ask: "What would feel lighter by next week?",
+                  fit: "Quick cleanup.",
+                },
+                {
+                  word: "Long Term",
+                  summary: "They want a stronger system.",
+                  say: "Then we should build the process that prevents the mess from coming back.",
+                  ask: "What keeps repeating?",
+                  fit: "SOP or workflow.",
+                },
+                {
+                  word: "Revenue First",
+                  summary: "They want money impact.",
+                  say: "Then lead follow-up and client flow should move to the top.",
+                  ask: "Where can better follow-up protect revenue?",
+                  fit: "Revenue workflow.",
+                },
+              ],
+            },
+            {
+              word: "Measurement",
+              summary: "They want to know if it worked.",
+              say: "We can define a simple success measure before we start.",
+              ask: "Would success be fewer delays, faster replies, cleaner files, or more time back?",
+              fit: "Set simple metrics.",
+              children: [
+                {
+                  word: "Hours Saved",
+                  summary: "Track time gained.",
+                  say: "We can compare what you spend now versus after the cleanup.",
+                  ask: "How many hours does this take now?",
+                  fit: "Time baseline.",
+                },
+                {
+                  word: "Response Speed",
+                  summary: "Track communication flow.",
+                  say: "Reply speed is a simple way to show better organization.",
+                  ask: "How quickly do you want replies handled?",
+                  fit: "Inbox process.",
+                },
+                {
+                  word: "Completion Rate",
+                  summary: "Track tasks closing.",
+                  say: "A tracker can show what is moving and what is stuck.",
+                  ask: "What needs to stop falling behind?",
+                  fit: "Task tracker.",
+                },
+              ],
+            },
+          ],
+        },
+        Capacity: {
+          icon: "▣",
+          color: "c-capacity",
+          levels: [
+            {
+              word: "Too Much",
+              summary: "They are carrying too many roles.",
+              say: "That is a capacity issue, not a character issue. We can move repeatable work into support.",
+              ask: "What role are you tired of playing in the business?",
+              fit: "Delegation plan.",
+              children: [
+                {
+                  word: "Admin",
+                  summary: "Admin pulls them from core work.",
+                  say: "Admin is often the first thing to delegate because it repeats.",
+                  ask: "Which admin task repeats the most?",
+                  fit: "Admin support.",
+                },
+                {
+                  word: "Client Care",
+                  summary: "Client communication needs help.",
+                  say: "We can support the client flow while you keep the relationship lead.",
+                  ask: "Where do clients need more consistency?",
+                  fit: "Client operations.",
+                },
+                {
+                  word: "Projects",
+                  summary: "Projects need coordination.",
+                  say: "We can create a clearer project rhythm with tasks, owners, and check-ins.",
+                  ask: "Which project feels hardest to keep moving?",
+                  fit: "Project coordination.",
+                },
+              ],
+            },
+            {
+              word: "Hiring Fear",
+              summary: "They need help but not an employee.",
+              say: "You may not need a full-time hire. You may need steady, focused support for the backend.",
+              ask: "What would you hand off first if you had help?",
+              fit: "Fractional support.",
+              children: [
+                {
+                  word: "Not Enough Work",
+                  summary: "They worry there is not enough for a hire.",
+                  say: "That is exactly where flexible support can fit.",
+                  ask: "How many hours of admin pile up each month?",
+                  fit: "Light monthly support.",
+                },
+                {
+                  word: "Training",
+                  summary: "They do not want to train someone heavily.",
+                  say: "We can start with documented examples and approval points.",
+                  ask: "Do you have examples of how you like things done?",
+                  fit: "Guided onboarding.",
+                },
+                {
+                  word: "Control",
+                  summary: "They want to stay involved.",
+                  say: "You stay the decision-maker. Support handles the repeatable pieces.",
+                  ask: "What do you want to approve before it goes out?",
+                  fit: "Approval workflow.",
+                },
+              ],
+            },
+            {
+              word: "Team Gaps",
+              summary: "The team lacks process or support.",
+              say: "Sometimes the team does not need more effort; they need clearer systems.",
+              ask: "Where does the team get stuck or confused?",
+              fit: "Team process cleanup.",
+              children: [
+                {
+                  word: "Handoffs",
+                  summary: "Work gets lost between people.",
+                  say: "Clear handoffs reduce confusion and repeated follow-up.",
+                  ask: "Where do handoffs break down?",
+                  fit: "Handoff workflow.",
+                },
+                {
+                  word: "Ownership",
+                  summary: "Nobody knows who owns what.",
+                  say: "A simple ownership map can clean that up quickly.",
+                  ask: "Which task has unclear ownership?",
+                  fit: "Responsibility map.",
+                },
+                {
+                  word: "Updates",
+                  summary: "Status is hard to see.",
+                  say: "A tracker can make project status visible without constant asking.",
+                  ask: "What status do you need to see quickly?",
+                  fit: "Status tracker.",
+                },
+              ],
+            },
+            {
+              word: "Burnout",
+              summary: "The owner is exhausted.",
+              say: "Support should make the business feel lighter, not just busier with more tasks.",
+              ask: "What would give you the most breathing room this month?",
+              fit: "Relief-first support.",
+              children: [
+                {
+                  word: "Always On",
+                  summary: "They never fully step away.",
+                  say: "We can create systems that make stepping away less risky.",
+                  ask: "What happens when you are unavailable?",
+                  fit: "Coverage workflow.",
+                },
+                {
+                  word: "Decision Fatigue",
+                  summary: "Small decisions drain them.",
+                  say: "Templates and rules reduce repeated decisions.",
+                  ask: "What decision do you repeat too often?",
+                  fit: "Decision templates.",
+                },
+                {
+                  word: "No Rest",
+                  summary: "Business follows them everywhere.",
+                  say: "The goal is to remove the constant mental tabs.",
+                  ask: "What mental tab stays open the most?",
+                  fit: "Mental load cleanup.",
+                },
+              ],
+            },
+          ],
+        },
+        Decision: {
+          icon: "?",
+          color: "c-decision",
+          levels: [
+            {
+              word: "Need Approval",
+              summary: "Someone else has to decide.",
+              say: "No problem. I can make this easy to explain with a simple recap of the problem, plan, and next step.",
+              ask: "Who needs to review this and what will they care about most?",
+              fit: "Shareable recap.",
+              children: [
+                {
+                  word: "Partner",
+                  summary: "A spouse or business partner decides.",
+                  say: "I can summarize the practical value without overselling it.",
+                  ask: "Will they care more about cost, time, or risk?",
+                  fit: "Decision summary.",
+                },
+                {
+                  word: "Manager",
+                  summary: "A supervisor needs details.",
+                  say: "We can frame this around outcomes and scope.",
+                  ask: "What information would help them approve it?",
+                  fit: "Approval notes.",
+                },
+                {
+                  word: "Board/Team",
+                  summary: "Multiple people weigh in.",
+                  say: "We can keep the recommendation clear and easy to compare.",
+                  ask: "What objections might come up?",
+                  fit: "Stakeholder recap.",
+                },
+              ],
+            },
+            {
+              word: "Need Time",
+              summary: "They want to think it over.",
+              say: "That is completely okay. The next step should feel clear, not rushed.",
+              ask: "What do you need to feel confident deciding?",
+              fit: "Clarify blocker.",
+              children: [
+                {
+                  word: "Compare",
+                  summary: "They are looking at options.",
+                  say: "It makes sense to compare. I would focus on who can solve the actual bottleneck cleanly.",
+                  ask: "What are you comparing this against?",
+                  fit: "Comparison frame.",
+                },
+                {
+                  word: "Timing",
+                  summary: "They need the right start window.",
+                  say: "We can choose a realistic start instead of forcing it now.",
+                  ask: "When would support be most useful?",
+                  fit: "Future start.",
+                },
+                {
+                  word: "Details",
+                  summary: "They need more information.",
+                  say: "I can answer the missing details simply.",
+                  ask: "Which detail would help you decide?",
+                  fit: "Clarify offer.",
+                },
+              ],
+            },
+            {
+              word: "Too Many Options",
+              summary: "They feel stuck choosing.",
+              say: "You do not need to choose alone. I can recommend the simplest option based on your biggest pain point.",
+              ask: "Do you want my recommendation?",
+              fit: "Recommend one path.",
+              children: [
+                {
+                  word: "Package",
+                  summary: "They need the right service level.",
+                  say: "I will match the package to the problem instead of the longest feature list.",
+                  ask: "Is the problem small, steady, or complex?",
+                  fit: "Package match.",
+                },
+                {
+                  word: "First Task",
+                  summary: "They do not know where to begin.",
+                  say: "We can start where the relief or return is fastest.",
+                  ask: "What would feel best to have handled first?",
+                  fit: "First task.",
+                },
+                {
+                  word: "Priority",
+                  summary: "Everything feels important.",
+                  say: "When everything feels important, we rank by urgency, impact, and repeatability.",
+                  ask: "What happens if nothing changes?",
+                  fit: "Priority sort.",
+                },
+              ],
+            },
+            {
+              word: "Past Bad Fit",
+              summary: "They have been disappointed before.",
+              say: "I understand why that would make you cautious. We can start with clear expectations, examples, and approval points.",
+              ask: "What went wrong last time?",
+              fit: "Trust rebuild.",
+              children: [
+                {
+                  word: "Poor Communication",
+                  summary: "They were left unsure.",
+                  say: "We can define update rhythm and response expectations up front.",
+                  ask: "How often do you want updates?",
+                  fit: "Communication plan.",
+                },
+                {
+                  word: "Low Quality",
+                  summary: "Work did not meet standards.",
+                  say: "Examples and approvals help protect quality from the start.",
+                  ask: "What standard matters most?",
+                  fit: "Quality workflow.",
+                },
+                {
+                  word: "Unclear Scope",
+                  summary: "Boundaries were messy.",
+                  say: "A clear scope keeps expectations clean.",
+                  ask: "What needs to be clearly included or excluded?",
+                  fit: "Scope agreement.",
+                },
+              ],
+            },
+          ],
+        },
+        Services: {
+          icon: "✦",
+          color: "c-scope",
+          levels: [
+            {
+              word: "What Help?",
+              summary: "They need to know what is included.",
+              say: "I can help with inbox, scheduling, follow-up, trackers, documents, onboarding, SOPs, coordination, and systems setup.",
+              ask: "Do you need communication, organization, or systems help?",
+              fit: "Match service to pain.",
+              children: [
+                {
+                  word: "Admin",
+                  summary: "Email, calendar, docs, reminders.",
+                  say: "If it repeats and interrupts the day, I can organize, draft, track, or systemize it.",
+                  ask: "Which admin task repeats most?",
+                  fit: "Flexible support.",
+                },
+                {
+                  word: "Client Flow",
+                  summary: "Intake through follow-up.",
+                  say: "We can organize the client experience from inquiry to onboarding to updates.",
+                  ask: "Where does client flow get messy?",
+                  fit: "Client operations.",
+                },
+                {
+                  word: "Systems",
+                  summary: "Templates, SOPs, workflows.",
+                  say: "I am not just completing tasks. I can help make the work easier over time.",
+                  ask: "What do you want to stop rebuilding?",
+                  fit: "Systems setup.",
+                },
+              ],
+            },
+            {
+              word: "Out of Scope",
+              summary: "They ask for work outside support.",
+              say: "I can organize, draft, track, and coordinate. Licensed advice should go to the right professional.",
+              ask: "Do you need help drafting, organizing, or managing the process around it?",
+              fit: "Keep admin-focused.",
+              children: [
+                {
+                  word: "Legal",
+                  summary: "Contracts or legal advice.",
+                  say: "I can organize documents or draft notes, but legal review should come from an attorney.",
+                  ask: "Do you need the information organized for review?",
+                  fit: "Document prep.",
+                },
+                {
+                  word: "Accounting",
+                  summary: "Tax or bookkeeping advice.",
+                  say: "I can organize records, but a tax or finance professional should advise.",
+                  ask: "What records need to be gathered?",
+                  fit: "Record organization.",
+                },
+                {
+                  word: "Creative",
+                  summary: "They need brand/content strategy.",
+                  say: "I can support organization and execution around the work, even if strategy belongs elsewhere.",
+                  ask: "Do you need project coordination around it?",
+                  fit: "Coordination.",
+                },
+              ],
+            },
+            {
+              word: "Customization",
+              summary: "They wonder if support fits their business.",
+              say: "Support should fit how your business actually works, not force you into a generic process.",
+              ask: "What needs to stay custom to your way of working?",
+              fit: "Custom workflow.",
+              children: [
+                {
+                  word: "Industry",
+                  summary: "Their business feels specific.",
+                  say: "We can learn the repeated parts of your workflow and build around them.",
+                  ask: "What is unique about your process?",
+                  fit: "Workflow mapping.",
+                },
+                {
+                  word: "Voice",
+                  summary: "They want messages to sound right.",
+                  say: "We can build a voice guide from examples.",
+                  ask: "Do you have replies you like?",
+                  fit: "Voice guide.",
+                },
+                {
+                  word: "Tools",
+                  summary: "They already use certain apps.",
+                  say: "We can work with your current tools where they make sense.",
+                  ask: "What tools do you already rely on?",
+                  fit: "Tool-fit setup.",
+                },
+              ],
+            },
+            {
+              word: "Deliverables",
+              summary: "They need concrete outputs.",
+              say: "We can name the exact deliverables before starting so the work feels clear.",
+              ask: "Would a checklist, tracker, template, cleanup, or SOP be most useful?",
+              fit: "Defined project.",
+              children: [
+                {
+                  word: "Tracker",
+                  summary: "They need visibility.",
+                  say: "A tracker can make leads, tasks, or clients easier to manage.",
+                  ask: "What needs to be tracked?",
+                  fit: "Tracker build.",
+                },
+                {
+                  word: "Templates",
+                  summary: "They repeat documents or replies.",
+                  say: "Templates reduce repeated thinking and speed up delivery.",
+                  ask: "What do you rewrite often?",
+                  fit: "Template set.",
+                },
+                {
+                  word: "SOP",
+                  summary: "They need a process documented.",
+                  say: "An SOP makes repeat work easier to hand off and repeat.",
+                  ask: "Which process should be documented first?",
+                  fit: "SOP build.",
+                },
+              ],
+            },
+          ],
+        },
+        Trust: {
+          icon: "✓",
+          color: "c-trust",
+          levels: [
+            {
+              word: "Access",
+              summary: "They worry about sharing tools or data.",
+              say: "That is understandable. We can use limited access, secure sharing, and only what is needed first.",
+              ask: "What tool or information feels most sensitive?",
+              fit: "Limited-access start.",
+              children: [
+                {
+                  word: "Limited Access",
+                  summary: "They want control.",
+                  say: "You stay in control. I can draft and prepare while you approve final changes.",
+                  ask: "Do you want approval before anything changes?",
+                  fit: "Approval workflow.",
+                },
+                {
+                  word: "Client Info",
+                  summary: "Sensitive details matter.",
+                  say: "We can set clear boundaries for what is shared and where it lives.",
+                  ask: "What client info should stay restricted?",
+                  fit: "Confidentiality boundaries.",
+                },
+                {
+                  word: "Logins",
+                  summary: "They worry about passwords.",
+                  say: "We can use safer sharing methods and avoid unnecessary access.",
+                  ask: "Which tools require access?",
+                  fit: "Secure access plan.",
+                },
+              ],
+            },
+            {
+              word: "Quality",
+              summary: "They worry work will not meet standards.",
+              say: "Quality improves when we use examples, checklists, and approval points.",
+              ask: "Do you have examples of how you like things done?",
+              fit: "Examples and approvals.",
+              children: [
+                {
+                  word: "Voice",
+                  summary: "Messages may not sound like them.",
+                  say: "I can draft in your voice and adjust until it feels right.",
+                  ask: "Do you prefer warm, direct, polished, casual, or detailed?",
+                  fit: "Voice guide.",
+                },
+                {
+                  word: "Mistakes",
+                  summary: "They worry details will be missed.",
+                  say: "Checklists make repeat work safer and cleaner.",
+                  ask: "What mistake matters most to avoid?",
+                  fit: "Checklist.",
+                },
+                {
+                  word: "Standards",
+                  summary: "They have a specific way.",
+                  say: "We can document your preferences so they are easy to repeat.",
+                  ask: "What should always be done your way?",
+                  fit: "Preference guide.",
+                },
+              ],
+            },
+            {
+              word: "Communication",
+              summary: "They fear being left in the dark.",
+              say: "We can agree on how updates happen so you always know what is moving.",
+              ask: "How often do you want updates?",
+              fit: "Update rhythm.",
+              children: [
+                {
+                  word: "Updates",
+                  summary: "They want progress visibility.",
+                  say: "A weekly update or tracker can show what is done, pending, and blocked.",
+                  ask: "What status do you want to see?",
+                  fit: "Status tracker.",
+                },
+                {
+                  word: "Questions",
+                  summary: "They do not want constant pings.",
+                  say: "We can batch questions unless something is urgent.",
+                  ask: "Do you prefer batched questions?",
+                  fit: "Communication rules.",
+                },
+                {
+                  word: "Response Time",
+                  summary: "They need expectations.",
+                  say: "We can define response expectations up front.",
+                  ask: "What response time feels reasonable?",
+                  fit: "Communication expectations.",
+                },
+              ],
+            },
+            {
+              word: "Confidentiality",
+              summary: "They want privacy protected.",
+              say: "Confidentiality should be built into the workflow from the start.",
+              ask: "What information should be treated as most sensitive?",
+              fit: "Privacy boundaries.",
+              children: [
+                {
+                  word: "Clients",
+                  summary: "Client privacy matters.",
+                  say: "We can limit what is accessed and keep client information organized carefully.",
+                  ask: "Which client details are most sensitive?",
+                  fit: "Client data rules.",
+                },
+                {
+                  word: "Internal Docs",
+                  summary: "Business documents are private.",
+                  say: "We can define what documents are needed and what stays restricted.",
+                  ask: "Which documents should stay off limits?",
+                  fit: "Access boundary.",
+                },
+                {
+                  word: "Approvals",
+                  summary: "They want final review.",
+                  say: "Approval points help protect privacy and accuracy.",
+                  ask: "What should always be approved before sending?",
+                  fit: "Approval process.",
+                },
+              ],
+            },
+          ],
+        },
+        Tech: {
+          icon: "↔",
+          color: "c-tech",
+          levels: [
+            {
+              word: "Messy Tools",
+              summary: "Info is scattered across apps.",
+              say: "Scattered tools create scattered work. We can decide what belongs where and create one simple flow.",
+              ask: "Where is information currently stored?",
+              fit: "Audit or systems cleanup.",
+              children: [
+                {
+                  word: "CRM/Tracker",
+                  summary: "Client or lead details are messy.",
+                  say: "A clean tracker makes follow-up and communication much easier.",
+                  ask: "Do you use a CRM, spreadsheet, inbox, or notes?",
+                  fit: "Tracker cleanup.",
+                },
+                {
+                  word: "Files",
+                  summary: "Documents are hard to find.",
+                  say: "Folders and naming rules can save a lot of time.",
+                  ask: "What file do you search for most?",
+                  fit: "File organization.",
+                },
+                {
+                  word: "Notes",
+                  summary: "Important info lives in random places.",
+                  say: "We can centralize notes so they become useful, not buried.",
+                  ask: "Where do notes usually end up?",
+                  fit: "Information cleanup.",
+                },
+              ],
+            },
+            {
+              word: "Migration",
+              summary: "They need to move data.",
+              say: "We can map what needs to move, back up what we can, migrate carefully, and check after the move.",
+              ask: "What are you moving from and to?",
+              fit: "Migration checklist.",
+              children: [
+                {
+                  word: "Data Loss",
+                  summary: "They fear losing info.",
+                  say: "That is the main thing we plan around before moving anything.",
+                  ask: "What would be most painful to lose?",
+                  fit: "Backup and review.",
+                },
+                {
+                  word: "Tool Choice",
+                  summary: "They are unsure what fits.",
+                  say: "The best tool is the one your business will actually use.",
+                  ask: "What does the tool need to track daily?",
+                  fit: "Software fit review.",
+                },
+                {
+                  word: "Cleanup First",
+                  summary: "Old data is messy.",
+                  say: "Cleaning before moving can prevent bringing the mess into the new system.",
+                  ask: "What data should not move over?",
+                  fit: "Pre-migration cleanup.",
+                },
+              ],
+            },
+            {
+              word: "Automation",
+              summary: "They want less manual work.",
+              say: "Automation helps most when the process is already clear. We can clean the flow first, then automate the right parts.",
+              ask: "What task do you want to happen automatically?",
+              fit: "Workflow setup.",
+              children: [
+                {
+                  word: "Reminders",
+                  summary: "They need automatic nudges.",
+                  say: "Reminders can protect follow-up without adding more mental load.",
+                  ask: "What needs reminders?",
+                  fit: "Reminder workflow.",
+                },
+                {
+                  word: "Intake",
+                  summary: "New client info should flow better.",
+                  say: "A clean intake process saves back-and-forth.",
+                  ask: "What info do you collect every time?",
+                  fit: "Intake setup.",
+                },
+                {
+                  word: "Reporting",
+                  summary: "They want updates created faster.",
+                  say: "We can organize the data so reports are easier to create.",
+                  ask: "What report do you need regularly?",
+                  fit: "Report workflow.",
+                },
+              ],
+            },
+            {
+              word: "Adoption",
+              summary: "They worry nobody will use the system.",
+              say: "A system only works if it is simple enough to keep using.",
+              ask: "Who needs to use the system every week?",
+              fit: "Simple system design.",
+              children: [
+                {
+                  word: "Team Use",
+                  summary: "Team members need clarity.",
+                  say: "We can build a workflow that makes ownership obvious.",
+                  ask: "Where does the team get confused?",
+                  fit: "Team workflow.",
+                },
+                {
+                  word: "Too Complicated",
+                  summary: "The system feels heavy.",
+                  say: "We can simplify before adding anything new.",
+                  ask: "What part feels too complicated?",
+                  fit: "Simplification.",
+                },
+                {
+                  word: "Training",
+                  summary: "People need instructions.",
+                  say: "Short instructions and SOPs make adoption easier.",
+                  ask: "Who needs to learn the process?",
+                  fit: "SOP and guide.",
+                },
+              ],
+            },
+          ],
+        },
+        Ready: {
+          icon: "→",
+          color: "c-ready",
+          levels: [
+            {
+              word: "No",
+              summary: "They are not moving forward.",
+              say: "I appreciate you being clear. If now is not the right fit, I can still leave you with one useful next step.",
+              ask: "Would it help if I named the first thing I would clean up whenever you are ready?",
+              fit: "Respect the no and leave value.",
+              children: [
+                {
+                  word: "Not Now",
+                  summary: "Timing is wrong.",
+                  say: "Timing matters. I would keep an eye on the area costing the most time.",
+                  ask: "When would it make sense to revisit this?",
+                  fit: "Future follow-up if welcomed.",
+                },
+                {
+                  word: "Not a Fit",
+                  summary: "They need something else.",
+                  say: "If this is outside admin, operations, or systems, I would rather point you in the right direction.",
+                  ask: "What kind of help are you actually looking for?",
+                  fit: "Redirect if needed.",
+                },
+                {
+                  word: "Price No",
+                  summary: "Budget blocks the yes.",
+                  say: "If the budget does not work, a smaller cleanup later may fit better than ongoing support now.",
+                  ask: "Should we revisit a one-time starter later or pause completely?",
+                  fit: "Smaller future path.",
+                },
+              ],
+            },
+            {
+              word: "Maybe",
+              summary: "They need clarity or confidence.",
+              say: "No pressure. A maybe usually means we need to make the next step clearer or smaller.",
+              ask: "What would help you decide: price, details, proof, or a smaller start?",
+              fit: "Answer blocker and offer starter.",
+              children: [
+                {
+                  word: "Need Clarity",
+                  summary: "They want it explained simply.",
+                  say: "The simple version is: choose the priority, clean it up, and create a smoother way to manage it.",
+                  ask: "Do you want my recommended first step?",
+                  fit: "Recommendation.",
+                },
+                {
+                  word: "Start Small",
+                  summary: "They want lower commitment.",
+                  say: "We can focus on one useful project instead of fixing everything at once.",
+                  ask: "Would inbox, scheduling, follow-up, files, or systems be first?",
+                  fit: "Starter project.",
+                },
+                {
+                  word: "Need Approval",
+                  summary: "Someone else must review.",
+                  say: "I can give you a simple summary to share.",
+                  ask: "Who approves this and what will they care about?",
+                  fit: "Shareable recap.",
+                },
+              ],
+            },
+            {
+              word: "Yes",
+              summary: "They are ready for the next step.",
+              say: "Great. We can get you moving with a cleaner setup, better workflows, and less chaos.",
+              ask: "Which start date works best, and what should we tackle first?",
+              fit: "Move to intake, agreement, invoice, onboarding.",
+              children: [
+                {
+                  word: "Start Soon",
+                  summary: "They want next steps.",
+                  say: "I can send the recommended option, agreement, invoice, and intake form.",
+                  ask: "Would you like me to recommend the simplest starting option?",
+                  fit: "Send next steps.",
+                },
+                {
+                  word: "Choose Package",
+                  summary: "They need the right option.",
+                  say: "I can recommend the option that matches the current need instead of making you guess.",
+                  ask: "Lightest useful option or most complete support?",
+                  fit: "Package recommendation.",
+                },
+                {
+                  word: "Ongoing",
+                  summary: "They want continued support.",
+                  say: "We can start with the priority cleanup, then keep support in place so things stay organized.",
+                  ask: "What would you want ongoing help with monthly?",
+                  fit: "Monthly support.",
+                },
+              ],
+            },
+          ],
+        },
+      };
+
+      let activeCategory = "Time";
+      let selectedOne = null;
+      let selectedTwo = null;
+      let selectedThree = null;
+
+      const categoryList = document.getElementById("categoryList");
+      const categoryTitle = document.getElementById("categoryTitle");
+      const categorySummary = document.getElementById("categorySummary");
+      const categoryTag = document.getElementById("categoryTag");
+      const levelOne = document.getElementById("levelOne");
+      const levelTwo = document.getElementById("levelTwo");
+      const levelThree = document.getElementById("levelThree");
+      const sayText = document.getElementById("sayText");
+      const askText = document.getElementById("askText");
+      const fitText = document.getElementById("fitText");
+      const microText = document.getElementById("microText");
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function makeChoice(item, onClick, isSelected) {
+        const btn = document.createElement("button");
+        btn.className = "choice" + (isSelected ? " selected" : "");
+        btn.innerHTML = `<div class="choice-word"><span>${escapeHtml(item.word)}</span><span>›</span></div><p>${escapeHtml(item.summary)}</p>`;
+        btn.addEventListener("click", onClick);
+        return btn;
+      }
+
+      function empty(text) {
+        const div = document.createElement("div");
+        div.className = "empty";
+        div.textContent = text;
+        return div;
+      }
+
+      function renderCategories() {
+        categoryList.innerHTML = "";
+        document.documentElement.style.setProperty(
+          "--category-count",
+          Object.keys(data).length,
+        );
+        Object.entries(data).forEach(([key, cat]) => {
+          const btn = document.createElement("button");
+          btn.className = "cat-btn" + (key === activeCategory ? " active" : "");
+          btn.innerHTML = `<div class="icon ${cat.color}">${cat.icon}</div><div class="word">${key}</div><div class="arrow">›</div>`;
+          btn.addEventListener("click", () => {
+            activeCategory = key;
+            selectedOne = null;
+            selectedTwo = null;
+            selectedThree = null;
+            render();
+          });
+          categoryList.appendChild(btn);
+        });
+      }
+
+      function render() {
+        renderCategories();
+        const cat = data[activeCategory];
+        categoryTitle.textContent = activeCategory;
+        categorySummary.textContent = "";
+        categoryTag.textContent = "";
+
+        levelOne.innerHTML = "";
+        cat.levels.forEach((item, index) => {
+          levelOne.appendChild(
+            makeChoice(
+              item,
+              () => {
+                selectedOne = index;
+                selectedTwo = null;
+                selectedThree = null;
+                render();
+              },
+              selectedOne === index,
+            ),
+          );
+        });
+
+        levelTwo.innerHTML = "";
+        if (selectedOne === null) {
+          levelTwo.appendChild(
+            empty("Choose a concern to open the next bracket."),
+          );
+        } else {
+          const children = cat.levels[selectedOne].children || [];
+          if (!children.length)
+            levelTwo.appendChild(empty("No deeper concern needed."));
+          children.forEach((item, index) => {
+            levelTwo.appendChild(
+              makeChoice(
+                item,
+                () => {
+                  selectedTwo = index;
+                  selectedThree = null;
+                  render();
+                },
+                selectedTwo === index,
+              ),
+            );
+          });
+        }
+
+        levelThree.innerHTML = "";
+        if (selectedOne === null) {
+          levelThree.appendChild(empty("Choose a concern first."));
+        } else if (selectedTwo === null) {
+          const item = cat.levels[selectedOne];
+          updateScript(item);
+          levelThree.appendChild(
+            empty("Choose a deeper concern, or use Say / Ask below."),
+          );
+        } else {
+          const item = cat.levels[selectedOne].children[selectedTwo];
+          const children = item.children || [];
+          updateScript(selectedThree === null ? item : children[selectedThree]);
+          if (!children.length) {
+            levelThree.appendChild(
+              empty("No extra layer needed. Use Say / Ask below."),
+            );
+          } else {
+            children.forEach((child, index) => {
+              levelThree.appendChild(
+                makeChoice(
+                  child,
+                  () => {
+                    selectedThree = index;
+                    updateScript(child);
+                    renderLevelThreeSelection(index);
+                  },
+                  selectedThree === index,
+                ),
+              );
+            });
+          }
+        }
+
+        if (selectedOne === null) {
+          updateScript({
+            say: "Start by choosing the client’s biggest concern.",
+            ask: "What feels like the biggest issue right now?",
+            fit: "Use the bracket to match the concern to the next step.",
+            summary: "Choose a category.",
+          });
+        }
+      }
+
+      function renderLevelThreeSelection(index) {
+        [...levelThree.querySelectorAll(".choice")].forEach((el, i) => {
+          el.classList.toggle("selected", i === index);
+        });
+      }
+
+      function updateScript(item) {
+        sayText.textContent =
+          item.say || "Use a calm, simple response that validates the concern.";
+        askText.textContent =
+          item.ask || "What would be most helpful to solve first?";
+        fitText.textContent =
+          item.fit || "Match their answer to a simple starter service.";
+        microText.textContent = item.summary || "";
+      }
+
+      function addConcern(categoryName, concern) {
+        const category = data[categoryName];
+        if (
+          !category ||
+          category.levels.some((item) => item.word === concern.word)
+        )
+          return;
+        category.levels.push(concern);
+      }
+
+      function addExtraConcerns() {
+        addConcern("Time", {
+          word: "No Process",
+          summary: "Work happens differently every time.",
+          say: "When the process changes every time, the business has to rely on memory. We can make the steps clear and repeatable.",
+          ask: "Which task needs a repeatable process first?",
+          fit: "Workflow or SOP setup.",
+          children: [
+            {
+              word: "Intake",
+              summary: "New requests arrive messy.",
+              say: "A cleaner intake makes every next step easier.",
+              ask: "What information do you always need upfront?",
+              fit: "Intake form or checklist.",
+            },
+            {
+              word: "Handoff",
+              summary: "Work gets passed unclearly.",
+              say: "A handoff process keeps details from disappearing between steps.",
+              ask: "Where does the handoff usually break?",
+              fit: "Handoff workflow.",
+            },
+            {
+              word: "Review",
+              summary: "Final checks are inconsistent.",
+              say: "A simple review checklist can catch issues before clients see them.",
+              ask: "What should always be checked before something is done?",
+              fit: "Review checklist.",
+            },
+          ],
+        });
+        addConcern("Cost", {
+          word: "Risk",
+          summary: "They worry about spending and not seeing change.",
+          say: "We can reduce risk by starting with one defined problem and one clear result.",
+          ask: "What result would make the first step feel worth it?",
+          fit: "Fixed starter project.",
+          children: [
+            {
+              word: "Trial First",
+              summary: "They want to test support.",
+              say: "A starter project is a simple way to test the fit without overcommitting.",
+              ask: "What would be a useful first test?",
+              fit: "Starter cleanup.",
+            },
+            {
+              word: "Clear Cap",
+              summary: "They need cost control.",
+              say: "We can keep the first scope capped and clear.",
+              ask: "Would a fixed first project feel better?",
+              fit: "Fixed scope.",
+            },
+            {
+              word: "Proof Point",
+              summary: "They need a visible win.",
+              say: "Then we should choose something they can feel quickly.",
+              ask: "What would be the most obvious win?",
+              fit: "Visible quick win.",
+            },
+          ],
+        });
+        addConcern("ROI", {
+          word: "Client Experience",
+          summary: "They want clients to feel better supported.",
+          say: "A smoother backend usually shows up as faster updates, clearer onboarding, and fewer dropped details.",
+          ask: "Where do clients feel the friction first?",
+          fit: "Client operations support.",
+          children: [
+            {
+              word: "Onboarding",
+              summary: "Starting clients feels messy.",
+              say: "Clean onboarding sets the tone for the whole relationship.",
+              ask: "What do new clients need right away?",
+              fit: "Onboarding workflow.",
+            },
+            {
+              word: "Updates",
+              summary: "Clients wait for status.",
+              say: "A simple update rhythm can calm clients without adding pressure.",
+              ask: "How often should clients hear from you?",
+              fit: "Update process.",
+            },
+            {
+              word: "Offboarding",
+              summary: "Projects end without a clean close.",
+              say: "A closing process can protect referrals and repeat work.",
+              ask: "What should happen when a project wraps?",
+              fit: "Offboarding checklist.",
+            },
+          ],
+        });
+        addConcern("Services", {
+          word: "Custom Need",
+          summary: "They are not sure if their request fits.",
+          say: "If it supports organization, operations, communication, or systems, we can usually shape it into a clear support project.",
+          ask: "What outcome are you trying to create?",
+          fit: "Custom operations project.",
+          children: [
+            {
+              word: "One-Time",
+              summary: "They need a project, not ongoing support.",
+              say: "A one-time project can clean up the immediate issue without a monthly commitment.",
+              ask: "What needs to be finished first?",
+              fit: "One-time project.",
+            },
+            {
+              word: "Ongoing",
+              summary: "They need steady help.",
+              say: "Ongoing support works best when the tasks repeat and need consistency.",
+              ask: "What repeats every week or month?",
+              fit: "Monthly support.",
+            },
+            {
+              word: "Build System",
+              summary: "They need structure created.",
+              say: "We can build the structure first so the task is easier to manage later.",
+              ask: "What system is missing right now?",
+              fit: "System setup.",
+            },
+          ],
+        });
+        addConcern("Trust", {
+          word: "Security",
+          summary: "They worry about sensitive access.",
+          say: "Access can be limited, intentional, and approval-based so you stay in control.",
+          ask: "What tool or information feels most sensitive?",
+          fit: "Limited-access workflow.",
+          children: [
+            {
+              word: "Passwords",
+              summary: "They worry about logins.",
+              say: "We can use secure sharing and only request what the task truly needs.",
+              ask: "Would limited permissions make you more comfortable?",
+              fit: "Secure access plan.",
+            },
+            {
+              word: "Client Data",
+              summary: "They protect private details.",
+              say: "We can define what information stays restricted before work begins.",
+              ask: "What information should stay off-limits?",
+              fit: "Privacy boundaries.",
+            },
+            {
+              word: "Approvals",
+              summary: "They want final review.",
+              say: "You can approve messages, changes, and final decisions before anything goes out.",
+              ask: "What should always need your approval?",
+              fit: "Approval workflow.",
+            },
+          ],
+        });
+        addConcern("Tech", {
+          word: "Too Many Tools",
+          summary: "Their tools do not work together.",
+          say: "Too many disconnected tools create extra work. We can simplify where information lives and how it moves.",
+          ask: "Which tools do you use every day?",
+          fit: "Tool audit.",
+          children: [
+            {
+              word: "Duplicate Info",
+              summary: "Same data lives in many places.",
+              say: "Duplicate information makes updates harder. We can choose one source of truth.",
+              ask: "Where should the main record live?",
+              fit: "Source-of-truth setup.",
+            },
+            {
+              word: "Manual Steps",
+              summary: "Too much copying and pasting.",
+              say: "Manual steps are a sign we may need a cleaner workflow or template.",
+              ask: "What do you copy from one place to another?",
+              fit: "Workflow cleanup.",
+            },
+            {
+              word: "Old System",
+              summary: "Their setup no longer fits.",
+              say: "A system that worked before may not fit the business now.",
+              ask: "What has outgrown the current setup?",
+              fit: "Systems refresh.",
+            },
+          ],
+        });
+        addConcern("Capacity", {
+          word: "Seasonal Rush",
+          summary: "Busy seasons overload the backend.",
+          say: "A busy season needs a lighter, clearer support plan before everything piles up.",
+          ask: "When does the rush usually hit?",
+          fit: "Seasonal support plan.",
+          children: [
+            {
+              word: "Prep",
+              summary: "They need setup before it gets busy.",
+              say: "Preparation makes the rush easier to manage.",
+              ask: "What should be cleaned up before busy season?",
+              fit: "Prep project.",
+            },
+            {
+              word: "Coverage",
+              summary: "They need help during the rush.",
+              say: "Support can help keep the backend moving while you focus on clients.",
+              ask: "What should be handled during the busiest weeks?",
+              fit: "Temporary support.",
+            },
+            {
+              word: "Cleanup",
+              summary: "Afterward everything is messy.",
+              say: "Post-rush cleanup can reset the business quickly.",
+              ask: "What piles up after the rush?",
+              fit: "Cleanup project.",
+            },
+          ],
+        });
+        addConcern("Decision", {
+          word: "Fear of Change",
+          summary: "They know it is messy but hesitate to change it.",
+          say: "Change does not have to be dramatic. We can improve one part first and keep what already works.",
+          ask: "What part of the current process do you want to protect?",
+          fit: "Low-disruption cleanup.",
+          children: [
+            {
+              word: "Disruption",
+              summary: "They worry change will slow them down.",
+              say: "We can make changes in small steps so the business keeps moving.",
+              ask: "What cannot be interrupted?",
+              fit: "Phased plan.",
+            },
+            {
+              word: "Team Buy-In",
+              summary: "Others may resist the change.",
+              say: "A simple process is easier for the team to accept.",
+              ask: "Who needs to understand the change?",
+              fit: "Team rollout notes.",
+            },
+            {
+              word: "Old Habits",
+              summary: "They may not stick with it.",
+              say: "The best system is the one simple enough to actually use.",
+              ask: "What would make the new process easy to keep?",
+              fit: "Simple workflow.",
+            },
+          ],
+        });
+        addConcern("Ready", {
+          word: "Later",
+          summary: "They want to revisit it later.",
+          say: "That is fine. We can leave the next step clear so it is easier to restart when the timing is right.",
+          ask: "What should change before you revisit support?",
+          fit: "Future follow-up path.",
+          children: [
+            {
+              word: "After Busy Season",
+              summary: "They need to get through current work.",
+              say: "That makes sense. The cleanup may be most useful right after the rush.",
+              ask: "When does this busy stretch end?",
+              fit: "Post-rush cleanup.",
+            },
+            {
+              word: "After Revenue",
+              summary: "They want stronger cash flow first.",
+              say: "Then a smaller starter project later may be the best fit.",
+              ask: "What revenue milestone would make this easier?",
+              fit: "Future starter.",
+            },
+            {
+              word: "After Approval",
+              summary: "They need someone else to decide.",
+              say: "We can make the approval conversation simple.",
+              ask: "What does the decision-maker need to see?",
+              fit: "Approval recap.",
+            },
+          ],
+        });
+      }
+
+      function addMoreLayers() {
+        const moreTemplates = [
+          {
+            word: "Urgent",
+            summary: "This needs attention soon.",
+            say: "If this is urgent, we can focus on the fastest cleanup first and keep the scope tight.",
+            ask: "What needs to be handled first this week?",
+            fit: "Fast cleanup or priority support.",
+          },
+          {
+            word: "Repeating",
+            summary: "This keeps happening again.",
+            say: "If it keeps repeating, it is probably ready for a system instead of another one-off fix.",
+            ask: "How often does this issue come back?",
+            fit: "Template, checklist, or SOP.",
+          },
+          {
+            word: "Owner-Held",
+            summary: "Too much depends on you.",
+            say: "If this depends on you every time, we can document the steps so it is easier to delegate or manage.",
+            ask: "What part still has to go through you?",
+            fit: "Documentation or handoff workflow.",
+          },
+        ];
+
+        Object.values(data).forEach((category) => {
+          category.levels.forEach((concern) => {
+            (concern.children || []).forEach((deeper) => {
+              if (!deeper.children || !deeper.children.length) {
+                deeper.children = moreTemplates.map((template) => ({
+                  ...template,
+                  say: deeper.say || template.say,
+                  ask: deeper.ask || template.ask,
+                  fit: deeper.fit || template.fit,
+                }));
+              }
+            });
+          });
+        });
+      }
+
+      addExtraConcerns();
+      addMoreLayers();
+      render();
+    </script>
+  </body>
+</html>
