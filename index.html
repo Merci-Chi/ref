@@ -301,26 +301,55 @@
       }
       .talk {
         min-height: 0;
-        border: 1px solid var(--line);
+        border: 1px solid var(--gold);
+        outline: 2px solid var(--gold);
+        outline-offset: -2px;
         border-radius: 18px;
-        background: #fff;
+        background: #fff4dd;
         padding: clamp(10px, 1.05vw, 15px);
         overflow: hidden;
         display: grid;
         grid-template-rows: auto 1fr;
+        box-shadow:
+          0 8px 16px rgba(185, 130, 46, 0.22),
+          inset 0 0 0 2px #ffffff;
       }
       .talk h3 {
-        margin: 0 0 8px;
-        color: var(--navy);
+        margin: 0 0 10px;
+        padding: 0 0 9px;
+        color: #7a5119;
         font-size: clamp(18px, 1.8vw, 28px);
         letter-spacing: -0.03em;
+        border-bottom: 2px solid rgba(185, 130, 46, 0.42);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .talk h3::after {
+        content: "›";
+        color: var(--gold);
+        font-size: clamp(16px, 1.25vw, 22px);
+        line-height: 1;
       }
       .talk p {
         margin: 0;
-        color: #324157;
+        color: #7a5119;
         font-size: clamp(14px, 1.35vw, 20px);
         line-height: 1.35;
         overflow: hidden;
+        position: relative;
+        padding: 0 0.2em;
+      }
+      .talk p::before {
+        content: "“";
+        color: var(--gold);
+        font-weight: 950;
+      }
+      .talk p::after {
+        content: "”";
+        color: var(--gold);
+        font-weight: 950;
       }
       #fitText,
       #microText {
@@ -1636,6 +1665,7 @@
       function makeChoice(item, onClick, isSelected) {
         const btn = document.createElement("button");
         btn.className = "choice" + (isSelected ? " selected" : "");
+        btn.title = `Say: ${item.say || ""}\nAsk: ${item.ask || ""}`;
         btn.innerHTML = `<div class="choice-word"><span>${escapeHtml(item.word)}</span><span>›</span></div><p>${escapeHtml(item.summary)}</p>`;
         btn.addEventListener("click", onClick);
         return btn;
@@ -2064,14 +2094,14 @@
           {
             word: "Urgent",
             summary: "This needs attention soon.",
-            say: "If this is urgent, we can focus on the fastest cleanup first and keep the scope tight.",
+            say: "If this needs attention soon, we can focus on the fastest useful cleanup first and keep the scope tight.",
             ask: "What needs to be handled first this week?",
             fit: "Fast cleanup or priority support.",
           },
           {
             word: "Repeating",
             summary: "This keeps happening again.",
-            say: "If it keeps repeating, it is probably ready for a system instead of another one-off fix.",
+            say: "If this keeps repeating, it is probably ready for a system instead of another one-off fix.",
             ask: "How often does this issue come back?",
             fit: "Template, checklist, or SOP.",
           },
@@ -2090,9 +2120,6 @@
               if (!deeper.children || !deeper.children.length) {
                 deeper.children = moreTemplates.map((template) => ({
                   ...template,
-                  say: deeper.say || template.say,
-                  ask: deeper.ask || template.ask,
-                  fit: deeper.fit || template.fit,
                 }));
               }
             });
@@ -2100,8 +2127,27 @@
         });
       }
 
+      function ensureSayAsk() {
+        const fallbackSay = (item) =>
+          `I understand. We can use this as the starting point and choose the simplest next step.`;
+        const fallbackAsk = (item) =>
+          `What would feel most helpful to solve first with ${item.word}?`;
+
+        const visit = (item) => {
+          if (!item.say) item.say = fallbackSay(item);
+          if (!item.ask) item.ask = fallbackAsk(item);
+          if (!item.summary) item.summary = item.word;
+          (item.children || []).forEach(visit);
+        };
+
+        Object.values(data).forEach((category) => {
+          (category.levels || []).forEach(visit);
+        });
+      }
+
       addExtraConcerns();
       addMoreLayers();
+      ensureSayAsk();
       render();
     </script>
   </body>
