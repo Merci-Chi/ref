@@ -1,0 +1,1457 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Polished Note Taking System</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #e8edf6;
+        --muted: #9aa8bb;
+        --navy: #263a58;
+        --gold: #d0a15f;
+        --blue: #7f9fb9;
+        --plum: #9584ad;
+        --line: rgba(132, 145, 166, 0.32);
+        --card: rgba(24, 31, 44, 0.82);
+        --card-strong: rgba(31, 40, 56, 0.94);
+        --field: rgba(17, 23, 34, 0.82);
+        --field-soft: rgba(24, 31, 44, 0.92);
+        --category-field: rgba(48, 39, 24, 0.96);
+        --category-field-focus: rgba(73, 55, 29, 0.98);
+        --category-line: rgba(208, 161, 95, 0.78);
+        --concern-field: rgba(24, 36, 51, 0.96);
+        --concern-field-focus: rgba(31, 48, 68, 0.98);
+        --concern-line: rgba(127, 159, 185, 0.72);
+        --extra-field: rgba(13, 19, 29, 0.72);
+        --focus: rgba(127, 159, 185, 0.13);
+        --placeholder: rgba(169, 180, 196, 0.56);
+        --shadow: 0 18px 42px rgba(0, 0, 0, 0.38);
+        --body-bg:
+          radial-gradient(
+            circle at top left,
+            rgba(127, 159, 185, 0.12),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(149, 132, 173, 0.1),
+            transparent 32%
+          ),
+          linear-gradient(135deg, #0b111b 0%, #111a28 48%, #0b1119 100%);
+        --selection-bg: rgba(127, 159, 185, 0.3);
+        --selection-color: #eef7ff;
+        --scrollbar-thumb: rgba(127, 159, 185, 0.48);
+        --scrollbar-track: rgba(17, 23, 34, 0.65);
+        --label-2-text: #1f1609;
+        --label-3-text: #101722;
+        --label-4-text: #101722;
+        --button-shadow: rgba(0, 0, 0, 0.28);
+        --glow: rgba(127, 159, 185, 0.16);
+        --category-glow: rgba(208, 161, 95, 0.16);
+      }
+
+      :root[data-theme="light"] {
+        color-scheme: light;
+        --ink: #162236;
+        --muted: #607086;
+        --navy: #102a43;
+        --gold: #b9822e;
+        --blue: #6d8ea8;
+        --plum: #7c6a91;
+        --line: rgba(221, 211, 196, 0.95);
+        --card: rgba(255, 255, 255, 0.88);
+        --card-strong: rgba(255, 255, 255, 0.96);
+        --field: rgba(255, 255, 255, 0.94);
+        --field-soft: rgba(252, 251, 248, 0.96);
+        --category-field: rgba(255, 244, 221, 0.98);
+        --category-field-focus: rgba(255, 238, 201, 1);
+        --category-line: rgba(185, 130, 46, 0.88);
+        --concern-field: rgba(232, 240, 247, 0.98);
+        --concern-field-focus: rgba(219, 233, 244, 1);
+        --concern-line: rgba(109, 142, 168, 0.76);
+        --extra-field: rgba(255, 255, 255, 0.78);
+        --focus: rgba(109, 142, 168, 0.14);
+        --placeholder: rgba(96, 112, 134, 0.55);
+        --shadow: 0 16px 34px rgba(21, 34, 56, 0.12);
+        --body-bg:
+          radial-gradient(
+            circle at top left,
+            rgba(109, 142, 168, 0.14),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at bottom right,
+            rgba(124, 106, 145, 0.12),
+            transparent 32%
+          ),
+          linear-gradient(135deg, #eef3f8 0%, #e7edf3 100%);
+        --selection-bg: rgba(109, 142, 168, 0.25);
+        --selection-color: #162236;
+        --scrollbar-thumb: rgba(109, 142, 168, 0.5);
+        --scrollbar-track: rgba(242, 236, 223, 0.8);
+        --label-2-text: #fff9ef;
+        --label-3-text: #ffffff;
+        --label-4-text: #ffffff;
+        --button-shadow: rgba(21, 34, 56, 0.12);
+        --glow: rgba(109, 142, 168, 0.16);
+        --category-glow: rgba(185, 130, 46, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: var(--body-bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+
+      ::selection {
+        background: var(--selection-bg);
+        color: var(--selection-color);
+      }
+
+      * {
+        scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+      }
+
+      .wrap {
+        width: min(1540px, calc(100vw - 28px));
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 14px 0 18px;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 12px;
+      }
+
+      .toolbar {
+        position: sticky;
+        top: 10px;
+        z-index: 10;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .app-title {
+        display: grid;
+        gap: 2px;
+        min-width: 190px;
+      }
+
+      .app-title strong {
+        font-size: 15px;
+        letter-spacing: 0.02em;
+      }
+
+      .app-title span {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tool-btn {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: linear-gradient(180deg, var(--field-soft), var(--field));
+        color: var(--ink);
+        padding: 8px 12px;
+        font: inherit;
+        font-weight: 900;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          border-color 0.14s ease,
+          box-shadow 0.14s ease,
+          background 0.14s ease;
+      }
+
+      .tool-btn:hover,
+      .tool-btn:focus {
+        border-color: var(--blue);
+        outline: none;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px var(--button-shadow);
+      }
+
+      .tool-btn:active {
+        transform: translateY(0);
+      }
+
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 126px;
+        justify-content: center;
+      }
+
+      .save-status {
+        min-width: 98px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--field);
+        color: var(--muted);
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 900;
+        text-align: center;
+        user-select: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+      }
+
+      .save-status::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: currentColor;
+        opacity: 0.75;
+      }
+
+      .save-status.is-saving {
+        color: var(--blue);
+      }
+
+      .save-status.is-saved {
+        color: var(--ink);
+      }
+
+      .theme-toggle::before {
+        content: "☾";
+        width: 18px;
+        text-align: center;
+      }
+
+      :root[data-theme="light"] .theme-toggle::before {
+        content: "☀";
+      }
+
+      .split-notes {
+        min-height: calc(100vh - 90px);
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .notes-card {
+        min-height: calc(100vh - 96px);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(12px);
+        padding: clamp(10px, 1.3vw, 18px);
+        overflow: auto;
+      }
+
+      .board-header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 2px 2px 10px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 950;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: linear-gradient(180deg, var(--card), transparent);
+      }
+
+      .board-count {
+        letter-spacing: 0;
+        text-transform: none;
+        opacity: 0.86;
+      }
+
+      .notes {
+        display: grid;
+        align-content: start;
+        gap: 8px;
+        min-height: calc(100% - 28px);
+      }
+
+      .note-row,
+      .add-row {
+        --indent: 0px;
+        margin-left: var(--indent);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--field-soft);
+        min-height: 46px;
+        transition:
+          border-color 0.14s ease,
+          box-shadow 0.14s ease,
+          background 0.14s ease,
+          transform 0.14s ease,
+          opacity 0.14s ease;
+      }
+
+      .note-row {
+        display: grid;
+        grid-template-columns: minmax(118px, auto) minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 10px;
+        padding: 8px 10px;
+      }
+
+      .note-row:hover {
+        border-color: rgba(127, 159, 185, 0.48);
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+      }
+
+      .note-row:focus-within,
+      .add-row:focus {
+        background: var(--focus);
+        border-color: var(--blue);
+        box-shadow:
+          0 8px 16px rgba(127, 159, 185, 0.12),
+          inset 0 0 0 1px rgba(232, 237, 246, 0.08);
+      }
+
+      .note-row.level-1 {
+        --indent: 0px;
+      }
+      .note-row.level-1 {
+        background: var(--category-field);
+        border-color: var(--category-line);
+        box-shadow:
+          0 8px 18px var(--category-glow),
+          inset 0 0 0 1px rgba(208, 161, 95, 0.12);
+      }
+      .note-row.level-1:focus-within {
+        background: var(--category-field-focus);
+        border-color: var(--gold);
+      }
+      .note-row.level-2 {
+        --indent: clamp(18px, 2.4vw, 34px);
+        background: var(--concern-field);
+        border-color: var(--concern-line);
+        box-shadow:
+          0 8px 18px var(--glow),
+          inset 0 0 0 1px rgba(127, 159, 185, 0.1);
+      }
+      .note-row.level-2:focus-within {
+        background: var(--concern-field-focus);
+        border-color: var(--blue);
+      }
+      .note-row.level-3 {
+        --indent: clamp(36px, 4.8vw, 68px);
+      }
+      .note-row.level-4 {
+        --indent: clamp(54px, 7.2vw, 102px);
+      }
+
+      .note-label {
+        width: max-content;
+        max-width: 100%;
+        border: 0;
+        border-radius: 12px;
+        padding: 7px 10px;
+        color: #f8f4ea;
+        font-weight: 950;
+        font-size: clamp(12px, 0.95vw, 15px);
+        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+        line-height: 1.1;
+        white-space: nowrap;
+        cursor: pointer;
+        outline: none;
+        user-select: none;
+      }
+
+      .note-label:focus {
+        outline: 2px solid var(--blue);
+        outline-offset: 2px;
+      }
+
+      .level-1 .note-label:focus {
+        outline-color: var(--gold);
+      }
+
+      .level-1 .note-label {
+        background: var(--gold);
+        color: var(--label-2-text);
+      }
+      .level-2 .note-label {
+        background: var(--blue);
+        color: var(--label-3-text);
+      }
+      .level-3 .note-label {
+        background: var(--navy);
+        color: #f8f4ea;
+      }
+      .level-4 .note-label {
+        background: var(--plum);
+        color: var(--label-4-text);
+      }
+
+      .note-text {
+        min-height: 31px;
+        white-space: pre-wrap;
+        padding: 5px 3px 3px;
+        color: var(--ink);
+        font-size: clamp(14px, 1.1vw, 18px);
+        line-height: 1.35;
+        outline: none;
+        overflow-wrap: anywhere;
+      }
+
+      .level-1 .note-text {
+        color: var(--gold);
+        font-size: clamp(17px, 1.35vw, 22px);
+        font-weight: 850;
+        letter-spacing: 0.01em;
+      }
+
+      .note-text:focus {
+        background: rgba(255, 255, 255, 0.015);
+        border-radius: 8px;
+      }
+
+      .note-text:empty::before,
+      .extra-text:empty::before {
+        color: var(--placeholder);
+        pointer-events: none;
+      }
+
+      .note-text:empty::before {
+        content: "Type here...";
+      }
+      .extra-text:empty::before {
+        content: attr(data-placeholder);
+      }
+
+      .row-controls {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 7px;
+        min-height: 30px;
+        white-space: nowrap;
+      }
+
+      .pitch-toggle,
+      .dropdown-toggle {
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: linear-gradient(180deg, var(--field-soft), var(--field));
+        color: var(--blue);
+        font: inherit;
+        font-weight: 950;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        line-height: 1;
+      }
+
+      .dropdown-toggle {
+        display: none;
+      }
+
+      .note-row.has-children .dropdown-toggle {
+        display: grid;
+      }
+
+      .pitch-toggle {
+        width: auto;
+        min-width: 48px;
+        padding: 0 9px;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .note-row.is-complete .pitch-toggle {
+        border-color: rgba(127, 159, 185, 0.55);
+      }
+
+      .level-1.is-complete .pitch-toggle {
+        border-color: rgba(208, 161, 95, 0.5);
+      }
+
+      .pitch-toggle:hover,
+      .pitch-toggle:focus,
+      .dropdown-toggle:hover,
+      .dropdown-toggle:focus {
+        border-color: var(--blue);
+        outline: none;
+        box-shadow: 0 6px 12px var(--button-shadow);
+      }
+
+      .note-row.is-pitch-open .pitch-toggle,
+      .note-row.has-collapsed-children .dropdown-toggle {
+        background: var(--focus);
+        border-color: var(--blue);
+      }
+
+      .completion-mark {
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        background: var(--field);
+        color: transparent;
+        font-size: 17px;
+        font-weight: 950;
+        line-height: 1;
+        user-select: none;
+      }
+
+      .note-row.is-complete .completion-mark {
+        color: var(--blue);
+        border-color: rgba(127, 159, 185, 0.52);
+        background: rgba(127, 159, 185, 0.12);
+      }
+
+      .level-1.is-complete .completion-mark {
+        color: var(--gold);
+      }
+
+      .extra-wrap {
+        display: none;
+        grid-column: 1 / 4;
+        margin-top: -1px;
+        border-left: 3px solid rgba(127, 159, 185, 0.42);
+        padding: 2px 0 0 10px;
+      }
+
+      .connected-parts {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 9px;
+      }
+
+      .connected-part {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        align-items: stretch;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .connected-label {
+        display: flex;
+        align-items: center;
+        color: var(--blue);
+        font-size: clamp(12px, 0.95vw, 14px);
+        font-weight: 950;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+      }
+
+      .note-row.is-pitch-open .extra-wrap {
+        display: block;
+      }
+
+      .note-row.is-child-hidden {
+        display: none;
+      }
+
+      .extra-text {
+        width: 100%;
+        white-space: pre-wrap;
+        min-height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--extra-field);
+        padding: 8px 10px;
+        color: var(--ink);
+        font-size: clamp(13px, 1vw, 16px);
+        line-height: 1.35;
+        outline: none;
+        overflow-wrap: anywhere;
+      }
+
+      .extra-text:focus {
+        border-color: var(--blue);
+        background: var(--field);
+        box-shadow: inset 0 0 0 2px rgba(127, 159, 185, 0.14);
+      }
+
+      .add-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        place-items: center;
+        width: 100%;
+        color: var(--blue);
+        font: inherit;
+        font-size: 25px;
+        font-weight: 950;
+        cursor: pointer;
+        padding: 8px 9px;
+        background: rgba(127, 159, 185, 0.06);
+      }
+
+      .add-row:hover {
+        border-color: var(--blue);
+        box-shadow: 0 8px 16px var(--button-shadow);
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      @media (max-width: 900px) {
+        .wrap {
+          width: min(100% - 18px, 1500px);
+          padding: 9px 0;
+        }
+
+        .toolbar {
+          position: static;
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .app-title {
+          min-width: 0;
+        }
+
+        .toolbar-actions {
+          justify-content: stretch;
+        }
+
+        .tool-btn,
+        .save-status {
+          flex: 1;
+        }
+
+        .split-notes {
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }
+
+        .notes-card {
+          min-height: 48vh;
+          border-radius: 18px;
+          padding: 10px;
+        }
+
+        .note-row {
+          grid-template-columns: 1fr auto;
+          gap: 4px 8px;
+        }
+
+        .note-label {
+          grid-column: 1 / 2;
+        }
+        .row-controls {
+          grid-column: 2 / 3;
+          grid-row: 1 / 2;
+        }
+        .note-text {
+          grid-column: 1 / 3;
+        }
+        .extra-wrap {
+          grid-column: 1 / 3;
+        }
+
+        .connected-parts {
+          grid-template-columns: 1fr;
+        }
+
+        .connected-part {
+          grid-template-columns: 1fr;
+          align-items: stretch;
+          gap: 5px;
+        }
+
+        .note-row.level-2 {
+          --indent: 14px;
+        }
+        .note-row.level-3 {
+          --indent: 28px;
+        }
+        .note-row.level-4 {
+          --indent: 42px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="toolbar" aria-label="Note data and theme controls">
+        <div class="app-title">
+          <strong>Note Taking System</strong>
+          <span>Tab indents · ⌘Z undo · Pitch opens Say / Ask</span>
+        </div>
+        <div class="toolbar-actions">
+          <button
+            class="tool-btn theme-toggle"
+            type="button"
+            id="themeToggle"
+            aria-pressed="false"
+          >
+            Dark
+          </button>
+          <span
+            class="save-status is-saved"
+            id="saveStatus"
+            role="status"
+            aria-live="polite"
+          >
+            Saved
+          </span>
+          <button class="tool-btn" type="button" id="exportData">Export</button>
+          <button class="tool-btn" type="button" id="importData">Import</button>
+        </div>
+        <input
+          class="sr-only"
+          type="file"
+          id="importFile"
+          accept="application/json,.json"
+        />
+      </section>
+
+      <section class="split-notes" aria-label="Two note taking systems">
+        <article class="notes-card" aria-label="Left note taking system">
+          <div class="board-header">
+            <span>Left Board</span>
+            <span class="board-count" data-count-for="left">0 rows</span>
+          </div>
+          <div class="notes" data-board="left"></div>
+        </article>
+
+        <article class="notes-card" aria-label="Right note taking system">
+          <div class="board-header">
+            <span>Right Board</span>
+            <span class="board-count" data-count-for="right">0 rows</span>
+          </div>
+          <div class="notes" data-board="right"></div>
+        </article>
+      </section>
+    </main>
+
+    <template id="noteTemplate">
+      <div
+        class="note-row level-1"
+        data-level="1"
+        data-pitch-open="false"
+        data-children-open="true"
+      >
+        <div class="note-label" tabindex="0">1. Category</div>
+        <div class="note-text" contenteditable="true" spellcheck="true"></div>
+        <div class="row-controls">
+          <div
+            class="completion-mark"
+            aria-label="Say and Ask complete"
+            title="Say and Ask complete"
+          >
+            ✓
+          </div>
+          <button
+            class="pitch-toggle"
+            type="button"
+            aria-label="Open pitch notes"
+            aria-expanded="false"
+            title="Open Say / Ask"
+          >
+            Pitch
+          </button>
+          <button
+            class="dropdown-toggle"
+            type="button"
+            aria-label="Collapse child notes"
+            aria-expanded="true"
+            title="Expand / collapse child notes"
+          >
+            ▾
+          </button>
+        </div>
+        <div class="extra-wrap">
+          <div class="connected-parts">
+            <div class="connected-part">
+              <div class="connected-label">Say:</div>
+              <div
+                class="extra-text say-text"
+                contenteditable="true"
+                spellcheck="true"
+                data-placeholder="Say..."
+              ></div>
+            </div>
+            <div class="connected-part">
+              <div class="connected-label">Ask:</div>
+              <div
+                class="extra-text ask-text"
+                contenteditable="true"
+                spellcheck="true"
+                data-placeholder="Ask...?"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <script>
+      const template = document.getElementById("noteTemplate");
+      const boards = [...document.querySelectorAll(".notes")];
+      const themeToggle = document.getElementById("themeToggle");
+      const exportButton = document.getElementById("exportData");
+      const importButton = document.getElementById("importData");
+      const importFile = document.getElementById("importFile");
+      const saveStatus = document.getElementById("saveStatus");
+
+      const labels = {
+        1: "1. Category",
+        2: "2. Concern:",
+        3: "3. Deeper:",
+        4: "4. More:",
+      };
+
+      const themeKey = "visible-note-system-theme";
+      const historyLimit = 120;
+      let appHistory = [];
+      let appHistoryIndex = -1;
+      let isRestoringHistory = false;
+      let historyTimer = null;
+      let saveStatusTimer = null;
+
+      function applyTheme(theme) {
+        const nextTheme = theme === "light" ? "light" : "dark";
+        document.documentElement.dataset.theme = nextTheme;
+        themeToggle.textContent = nextTheme === "light" ? "Light" : "Dark";
+        themeToggle.setAttribute(
+          "aria-pressed",
+          nextTheme === "dark" ? "true" : "false",
+        );
+        localStorage.setItem(themeKey, nextTheme);
+      }
+
+      function loadTheme() {
+        applyTheme("dark");
+      }
+
+      function toggleTheme() {
+        const current = document.documentElement.dataset.theme || "dark";
+        applyTheme(current === "dark" ? "light" : "dark");
+      }
+
+      function setSaveStatus(text, state = "saved") {
+        saveStatus.textContent = text;
+        saveStatus.classList.toggle("is-saving", state === "saving");
+        saveStatus.classList.toggle("is-saved", state === "saved");
+      }
+
+      function showSavingThenSaved() {
+        clearTimeout(saveStatusTimer);
+        setSaveStatus("Saving...", "saving");
+        saveStatusTimer = setTimeout(
+          () => setSaveStatus("Saved", "saved"),
+          220,
+        );
+      }
+
+      function updateBoardCount(board) {
+        if (!board) return;
+        const countEl = document.querySelector(
+          `[data-count-for="${board.dataset.board}"]`,
+        );
+        if (!countEl) return;
+        const rows = board.querySelectorAll(".note-row").length;
+        const complete = board.querySelectorAll(".note-row.is-complete").length;
+        countEl.textContent = `${rows} row${rows === 1 ? "" : "s"} · ${complete} complete`;
+      }
+
+      function updateBoardCounts() {
+        boards.forEach(updateBoardCount);
+      }
+
+      function getAllBoardsData() {
+        return Object.fromEntries(
+          boards.map((board) => [board.dataset.board, getBoardData(board)]),
+        );
+      }
+
+      function getHistorySnapshot() {
+        return JSON.stringify({ boards: getAllBoardsData() });
+      }
+
+      function recordHistoryNow() {
+        if (isRestoringHistory) return;
+        const snapshot = getHistorySnapshot();
+        if (appHistory[appHistoryIndex] === snapshot) return;
+
+        if (appHistoryIndex < appHistory.length - 1) {
+          appHistory = appHistory.slice(0, appHistoryIndex + 1);
+        }
+
+        appHistory.push(snapshot);
+        if (appHistory.length > historyLimit) {
+          appHistory.shift();
+        }
+        appHistoryIndex = appHistory.length - 1;
+      }
+
+      function scheduleHistoryRecord() {
+        if (isRestoringHistory) return;
+        clearTimeout(historyTimer);
+        historyTimer = setTimeout(recordHistoryNow, 350);
+      }
+
+      function commitPendingHistory() {
+        clearTimeout(historyTimer);
+        recordHistoryNow();
+      }
+
+      function saveAllBoards(shouldRecord = false) {
+        boards.forEach((board) => {
+          updateCompletionMarks(board);
+          applyChildVisibility(board);
+          localStorage.setItem(
+            storageKey(board),
+            JSON.stringify(getBoardData(board)),
+          );
+          updateBoardCount(board);
+        });
+        showSavingThenSaved();
+        if (shouldRecord) scheduleHistoryRecord();
+      }
+
+      function restoreHistorySnapshot(snapshot) {
+        const parsed = JSON.parse(snapshot);
+        isRestoringHistory = true;
+        boards.forEach((board) => {
+          renderBoard(board, parsed.boards?.[board.dataset.board] || [], false);
+        });
+        saveAllBoards(false);
+        isRestoringHistory = false;
+        setSaveStatus("Saved", "saved");
+      }
+
+      function undoHistory() {
+        commitPendingHistory();
+        if (appHistoryIndex <= 0) return;
+        appHistoryIndex -= 1;
+        restoreHistorySnapshot(appHistory[appHistoryIndex]);
+      }
+
+      function redoHistory() {
+        commitPendingHistory();
+        if (appHistoryIndex >= appHistory.length - 1) return;
+        appHistoryIndex += 1;
+        restoreHistorySnapshot(appHistory[appHistoryIndex]);
+      }
+
+      function handleHistoryShortcuts(event) {
+        const isUndoRedoKey =
+          (event.metaKey || event.ctrlKey) &&
+          !event.altKey &&
+          event.key.toLowerCase() === "z";
+        if (!isUndoRedoKey) return;
+
+        event.preventDefault();
+        if (event.shiftKey) redoHistory();
+        else undoHistory();
+      }
+
+      function storageKey(board) {
+        return `visible-note-system-${board.dataset.board}`;
+      }
+
+      function safeLevel(level) {
+        return Math.max(1, Math.min(4, Number(level) || 1));
+      }
+
+      function makeNote(
+        level = 1,
+        text = "",
+        say = "",
+        ask = "",
+        pitchOpen = false,
+        childrenOpen = true,
+      ) {
+        const row = template.content.firstElementChild.cloneNode(true);
+        setLevel(row, level, false);
+        row.querySelector(".note-text").textContent = text || "";
+        row.querySelector(".say-text").textContent = say || "";
+        row.querySelector(".ask-text").textContent = ask || "";
+        setPitchOpen(row, Boolean(pitchOpen), false);
+        setChildrenOpen(row, childrenOpen !== false, false);
+        updateCompletionMark(row);
+        return row;
+      }
+
+      function makeAddButton() {
+        const button = document.createElement("button");
+        button.className = "add-row";
+        button.type = "button";
+        button.textContent = "+";
+        button.setAttribute("aria-label", "Add new row");
+        return button;
+      }
+
+      function setLevel(row, level, shouldSave = true) {
+        if (!row) return;
+        const nextLevel = safeLevel(level);
+        row.dataset.level = String(nextLevel);
+        row.classList.remove("level-1", "level-2", "level-3", "level-4");
+        row.classList.add(`level-${nextLevel}`);
+        row.querySelector(".note-label").textContent = labels[nextLevel];
+        if (shouldSave) saveBoard(row.closest(".notes"));
+      }
+
+      function setPitchOpen(row, open, shouldSave = true) {
+        if (!row) return;
+        row.dataset.pitchOpen = open ? "true" : "false";
+        row.classList.toggle("is-pitch-open", open);
+        const toggle = row.querySelector(".pitch-toggle");
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        toggle.setAttribute(
+          "aria-label",
+          open ? "Close pitch notes" : "Open pitch notes",
+        );
+        if (shouldSave) saveBoard(row.closest(".notes"));
+      }
+
+      function setChildrenOpen(row, open, shouldSave = true) {
+        if (!row) return;
+        const board = row.closest(".notes");
+        updateChildControls(board);
+        if (!row.classList.contains("has-children")) open = true;
+        row.dataset.childrenOpen = open ? "true" : "false";
+        row.classList.toggle("has-collapsed-children", !open);
+        const toggle = row.querySelector(".dropdown-toggle");
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        toggle.textContent = open ? "▾" : "▸";
+        toggle.setAttribute(
+          "aria-label",
+          open ? "Collapse child notes" : "Expand child notes",
+        );
+        toggle.title = open ? "Collapse child notes" : "Expand child notes";
+        applyChildVisibility(board);
+        if (shouldSave) saveBoard(board);
+      }
+
+      function lastNote(board) {
+        return [...board.querySelectorAll(".note-row")].at(-1);
+      }
+
+      function addRowAtBottom(board) {
+        const previous = lastNote(board);
+        const level = previous ? Number(previous.dataset.level) : 1;
+        const newRow = makeNote(level);
+        board.querySelector(".add-row").before(newRow);
+        saveBoard(board);
+        focusText(newRow);
+      }
+
+      function insertAfter(newRow, currentRow) {
+        currentRow.after(newRow);
+        saveBoard(currentRow.closest(".notes"));
+      }
+
+      function focusEditable(el) {
+        if (!el) return;
+        el.focus();
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      function focusText(row) {
+        focusEditable(row.querySelector(".note-text"));
+      }
+
+      function updateCompletionMark(row) {
+        if (!row) return;
+        const say = row.querySelector(".say-text")?.textContent.trim() || "";
+        const ask = row.querySelector(".ask-text")?.textContent.trim() || "";
+        const complete = Boolean(say && ask);
+        row.classList.toggle("is-complete", complete);
+        const mark = row.querySelector(".completion-mark");
+        if (mark) {
+          mark.title = complete
+            ? "Say and Ask complete"
+            : "Say and Ask are not both filled yet";
+          mark.setAttribute("aria-label", mark.title);
+        }
+      }
+
+      function updateCompletionMarks(board) {
+        board?.querySelectorAll(".note-row").forEach(updateCompletionMark);
+      }
+
+      function updateChildControls(board) {
+        if (!board) return;
+        const rows = [...board.querySelectorAll(".note-row")];
+        rows.forEach((row, index) => {
+          const level = Number(row.dataset.level);
+          const nextRow = rows[index + 1];
+          let childCount = 0;
+          for (let i = index + 1; i < rows.length; i += 1) {
+            const childLevel = Number(rows[i].dataset.level);
+            if (childLevel <= level) break;
+            if (childLevel === level + 1) childCount += 1;
+          }
+          const hasChildren = childCount > 0;
+          row.classList.toggle("has-children", hasChildren);
+          const toggle = row.querySelector(".dropdown-toggle");
+          toggle.hidden = !hasChildren;
+          if (hasChildren) {
+            toggle.title = `${childCount} child note${childCount === 1 ? "" : "s"}`;
+          } else {
+            row.dataset.childrenOpen = "true";
+            row.classList.remove("has-collapsed-children");
+            toggle.setAttribute("aria-expanded", "true");
+            toggle.textContent = "▾";
+            toggle.setAttribute("aria-label", "No child notes to collapse");
+            toggle.title = "No child notes";
+          }
+        });
+      }
+
+      function applyChildVisibility(board) {
+        if (!board) return;
+        updateChildControls(board);
+        let collapsedParentLevels = [];
+        [...board.querySelectorAll(".note-row")].forEach((row) => {
+          const level = Number(row.dataset.level);
+          collapsedParentLevels = collapsedParentLevels.filter(
+            (parentLevel) => parentLevel < level,
+          );
+          const isHidden = collapsedParentLevels.length > 0;
+          row.classList.toggle("is-child-hidden", isHidden);
+          if (
+            row.classList.contains("has-children") &&
+            row.dataset.childrenOpen === "false"
+          ) {
+            collapsedParentLevels.push(level);
+          }
+        });
+      }
+
+      function getBoardData(board) {
+        return [...board.querySelectorAll(".note-row")].map((row) => ({
+          level: Number(row.dataset.level),
+          text: row.querySelector(".note-text").textContent,
+          say: row.querySelector(".say-text").textContent,
+          ask: row.querySelector(".ask-text").textContent,
+          pitchOpen: row.dataset.pitchOpen === "true",
+          childrenOpen: row.dataset.childrenOpen !== "false",
+          open: row.dataset.pitchOpen === "true",
+        }));
+      }
+
+      function saveBoard(board, shouldRecord = true) {
+        if (!board) return;
+        updateCompletionMarks(board);
+        applyChildVisibility(board);
+        localStorage.setItem(
+          storageKey(board),
+          JSON.stringify(getBoardData(board)),
+        );
+        updateBoardCount(board);
+        showSavingThenSaved();
+        if (shouldRecord) scheduleHistoryRecord();
+      }
+
+      function clearBoard(board) {
+        board
+          .querySelectorAll(".note-row, .add-row")
+          .forEach((el) => el.remove());
+      }
+
+      function renderBoard(board, rows, shouldSave = true) {
+        clearBoard(board);
+        const usableRows =
+          Array.isArray(rows) && rows.length
+            ? rows
+            : [
+                {
+                  level: 1,
+                  text: "",
+                  say: "",
+                  ask: "",
+                  pitchOpen: false,
+                  childrenOpen: true,
+                },
+              ];
+        usableRows.forEach((item) => {
+          board.append(
+            makeNote(
+              item.level,
+              item.text,
+              item.say ?? item.extra,
+              item.ask,
+              item.pitchOpen ?? item.open,
+              item.childrenOpen,
+            ),
+          );
+        });
+        board.append(makeAddButton());
+        applyChildVisibility(board);
+        if (shouldSave) saveBoard(board);
+      }
+
+      function loadBoard(board) {
+        let saved = [];
+        try {
+          saved = JSON.parse(localStorage.getItem(storageKey(board)) || "[]");
+        } catch {}
+        renderBoard(board, saved, false);
+      }
+
+      function deleteRow(row) {
+        const board = row.closest(".notes");
+        const remaining = [...board.querySelectorAll(".note-row")];
+        if (remaining.length === 1) {
+          row.querySelector(".note-text").textContent = "";
+          row.querySelector(".say-text").textContent = "";
+          row.querySelector(".ask-text").textContent = "";
+          setLevel(row, 1, false);
+          setPitchOpen(row, false, false);
+          setChildrenOpen(row, true, false);
+          updateCompletionMark(row);
+          saveBoard(board);
+          focusText(row);
+          return;
+        }
+
+        const nextFocus = row.nextElementSibling?.classList.contains("note-row")
+          ? row.nextElementSibling
+          : row.previousElementSibling?.classList.contains("note-row")
+            ? row.previousElementSibling
+            : null;
+
+        row.remove();
+        saveBoard(board);
+        if (nextFocus) focusText(nextFocus);
+      }
+
+      function exportData() {
+        const payload = {
+          version: 5,
+          exportedAt: new Date().toISOString(),
+          theme: document.documentElement.dataset.theme || "dark",
+          boards: getAllBoardsData(),
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `note-taking-system-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function normalizeImport(parsed) {
+        if (parsed?.boards && typeof parsed.boards === "object")
+          return parsed.boards;
+        if (parsed?.left || parsed?.right) return parsed;
+        if (Array.isArray(parsed)) return { left: parsed };
+        throw new Error("Import file does not match this note system format.");
+      }
+
+      function importDataFile(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(String(reader.result || "{}"));
+            const importedBoards = normalizeImport(parsed);
+            if (parsed.theme === "light" || parsed.theme === "dark")
+              applyTheme(parsed.theme);
+            boards.forEach((board) => {
+              const rows = importedBoards[board.dataset.board];
+              if (Array.isArray(rows)) renderBoard(board, rows, false);
+            });
+            saveAllBoards(true);
+            recordHistoryNow();
+            alert("Imported note data successfully.");
+          } catch (error) {
+            alert(error.message || "Could not import that file.");
+          } finally {
+            importFile.value = "";
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function insertPlainText(text) {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return false;
+
+        selection.deleteFromDocument();
+        const range = selection.getRangeAt(0);
+        const textNode = document.createTextNode(text);
+        range.insertNode(textNode);
+        range.setStartAfter(textNode);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        return true;
+      }
+
+      function normalizeEditablePaste(event) {
+        const editable = event.target.closest?.(".note-text, .extra-text");
+        if (!editable) return;
+
+        event.preventDefault();
+        const text = event.clipboardData?.getData("text/plain") || "";
+
+        if (!document.execCommand("insertText", false, text)) {
+          insertPlainText(text);
+        }
+
+        const board = editable.closest(".notes");
+        if (board) saveBoard(board);
+      }
+
+      document.addEventListener("keydown", handleHistoryShortcuts, true);
+
+      document.addEventListener("keydown", (event) => {
+        const row = event.target.closest?.(".note-row");
+        if (!row) return;
+
+        const level = Number(row.dataset.level);
+        const isText = event.target.classList.contains("note-text");
+        const isExtra = event.target.classList.contains("extra-text");
+        const isLabel = event.target.classList.contains("note-label");
+        const isDeleteKey = event.key === "Delete" || event.key === "Backspace";
+
+        if ((isText || isExtra || isLabel) && isDeleteKey && event.metaKey) {
+          event.preventDefault();
+          deleteRow(row);
+          return;
+        }
+
+        if ((isText || isExtra || isLabel) && isDeleteKey && event.shiftKey) {
+          event.preventDefault();
+          setLevel(row, level - 1);
+          if (isText) focusText(row);
+          if (isExtra) focusEditable(row.querySelector(".extra-text"));
+          return;
+        }
+
+        if (isText && event.key === "Enter") {
+          event.preventDefault();
+          const newRow = makeNote(level);
+          insertAfter(newRow, row);
+          focusText(newRow);
+          return;
+        }
+
+        if ((isText || isExtra || isLabel) && event.key === "Tab") {
+          event.preventDefault();
+          setLevel(row, event.shiftKey ? level - 1 : level + 1);
+          if (isText) focusText(row);
+          if (isExtra) focusEditable(row.querySelector(".extra-text"));
+          return;
+        }
+
+        if (isLabel && event.key === "Enter") {
+          event.preventDefault();
+          const newRow = makeNote(level);
+          insertAfter(newRow, row);
+          focusText(newRow);
+        }
+      });
+
+      document.addEventListener("paste", normalizeEditablePaste);
+
+      document.addEventListener("input", (event) => {
+        const board = event.target.closest?.(".notes");
+        if (board) saveBoard(board);
+      });
+
+      document.addEventListener("click", (event) => {
+        const addButton = event.target.closest?.(".add-row");
+        if (addButton) {
+          addRowAtBottom(addButton.closest(".notes"));
+          return;
+        }
+
+        const pitchToggle = event.target.closest?.(".pitch-toggle");
+        if (pitchToggle) {
+          const row = pitchToggle.closest(".note-row");
+          const shouldOpen = row.dataset.pitchOpen !== "true";
+          setPitchOpen(row, shouldOpen);
+          if (shouldOpen) focusEditable(row.querySelector(".say-text"));
+          return;
+        }
+
+        const toggle = event.target.closest?.(".dropdown-toggle");
+        if (toggle) {
+          const row = toggle.closest(".note-row");
+          const shouldOpen = row.dataset.childrenOpen === "false";
+          setChildrenOpen(row, shouldOpen);
+        }
+      });
+
+      themeToggle.addEventListener("click", toggleTheme);
+      exportButton.addEventListener("click", exportData);
+      importButton.addEventListener("click", () => importFile.click());
+      importFile.addEventListener("change", () => {
+        const file = importFile.files?.[0];
+        if (file) importDataFile(file);
+      });
+
+      loadTheme();
+      boards.forEach(loadBoard);
+      updateBoardCounts();
+      recordHistoryNow();
+      setSaveStatus("Saved", "saved");
+    </script>
+  </body>
+</html>
