@@ -723,6 +723,13 @@
         box-shadow: 0 4px 0 var(--gold);
       }
 
+      .note-row.drop-inside {
+        border-color: var(--gold);
+        box-shadow:
+          0 0 0 2px var(--gold),
+          0 10px 22px rgba(0, 0, 0, 0.14);
+      }
+
       .note-label {
         touch-action: none;
       }
@@ -1416,51 +1423,95 @@
       }
 
       function clearDropMarkers() {
-        currentDropTarget?.classList.remove("drop-before", "drop-after");
+        currentDropTarget?.classList.remove("drop-before", "drop-after", "drop-inside");
         currentDropTarget = null;
         currentDropPosition = null;
       }
 
       function updateDropMarker(targetRow, position) {
         if (targetRow === currentDropTarget && position === currentDropPosition) return;
+
         clearDropMarkers();
+
         currentDropTarget = targetRow;
         currentDropPosition = position;
-        if (targetRow) targetRow.classList.add(position === "before" ? "drop-before" : "drop-after");
+
+        if (!targetRow) return;
+
+        if (position === "before") {
+          targetRow.classList.add("drop-before");
+        } else if (position === "after") {
+          targetRow.classList.add("drop-after");
+        } else {
+          targetRow.classList.add("drop-inside");
+        }
       }
 
       function findDropTarget(event, board) {
         const targetRow = event.target.closest?.(".note-row");
         if (!targetRow || !board.contains(targetRow)) return null;
+
         const rect = targetRow.getBoundingClientRect();
-        const position = event.clientY < rect.top + rect.height / 2 ? "before" : "after";
+        const y = event.clientY - rect.top;
+        const level = Number(targetRow.dataset.level);
+
+        let position = "inside";
+
+        if (y < rect.height * 0.25) {
+          position = "before";
+        } else if (y > rect.height * 0.75) {
+          position = "after";
+        }
+
+        if (position === "inside" && level >= 4) {
+          position = "after";
+        }
+
         return { targetRow, position };
       }
 
       function moveDraggedBlock(targetRow, position) {
         if (!draggedBlockRow || !targetRow || draggedBlockRow === targetRow) return;
+
         const board = draggedBlockRow.closest(".notes");
         if (!board || targetRow.closest(".notes") !== board) return;
 
         const draggedRows = getBlockRows(draggedBlockRow);
         if (draggedRows.includes(targetRow)) return;
 
-        const targetBlockRows = getBlockRows(targetRow);
-        const insertAfterRow = position === "after" ? targetBlockRows.at(-1) : null;
-        const previousAnchor = position === "before"
-          ? targetRow.previousElementSibling
-          : insertAfterRow;
-        const previousLevel = previousAnchor?.classList?.contains("note-row")
-          ? Number(previousAnchor.dataset.level)
-          : null;
         const firstDraggedLevel = Number(draggedBlockRow.dataset.level);
-        const maxAllowed = previousLevel === null ? 1 : Math.min(4, previousLevel + 1);
-        const nextFirstLevel = Math.min(firstDraggedLevel, maxAllowed);
+        let insertReference = targetRow;
+        let nextFirstLevel = firstDraggedLevel;
+
+        if (position === "inside") {
+          nextFirstLevel = Math.min(4, Number(targetRow.dataset.level) + 1);
+          insertReference = targetRow;
+        } else if (position === "after") {
+          const targetBlockRows = getBlockRows(targetRow);
+          insertReference = targetBlockRows.at(-1);
+
+          const previousLevel = Number(insertReference.dataset.level);
+          const maxAllowed = Math.min(4, previousLevel + 1);
+          nextFirstLevel = Math.min(firstDraggedLevel, maxAllowed);
+        } else {
+          const previousAnchor = targetRow.previousElementSibling;
+          const previousLevel = previousAnchor?.classList?.contains("note-row")
+            ? Number(previousAnchor.dataset.level)
+            : null;
+
+          const maxAllowed = previousLevel === null ? 1 : Math.min(4, previousLevel + 1);
+          nextFirstLevel = Math.min(firstDraggedLevel, maxAllowed);
+        }
+
         const delta = nextFirstLevel - firstDraggedLevel;
 
         draggedRows.forEach((item) => item.remove());
-        if (position === "before") targetRow.before(...draggedRows);
-        else insertAfterRow.after(...draggedRows);
+
+        if (position === "before") {
+          targetRow.before(...draggedRows);
+        } else {
+          insertReference.after(...draggedRows);
+        }
 
         if (delta) {
           draggedRows.forEach((item) => {
@@ -1468,6 +1519,12 @@
           });
         }
 
+        if (position === "inside") {
+          setChildrenOpen(targetRow, true, false);
+        }
+
+        updateChildControls(board);
+        applyChildVisibility(board);
         selectBlock(draggedBlockRow);
         saveBoard(board);
       }
