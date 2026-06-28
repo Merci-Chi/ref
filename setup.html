@@ -633,6 +633,73 @@
         box-shadow: 0 8px 16px var(--button-shadow);
       }
 
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: none;
+        place-items: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.54);
+        backdrop-filter: blur(8px);
+      }
+
+      .modal-backdrop.is-open {
+        display: grid;
+      }
+
+      .modal-card {
+        width: min(560px, 100%);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: var(--card-strong);
+        box-shadow: var(--shadow);
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .modal-card h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.01em;
+      }
+
+      .modal-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1.45;
+      }
+
+      .modal-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        justify-content: flex-end;
+      }
+
+      .modal-textarea {
+        width: 100%;
+        min-height: 260px;
+        resize: vertical;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--field);
+        color: var(--ink);
+        padding: 12px;
+        font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        outline: none;
+      }
+
+      .modal-textarea:focus {
+        border-color: var(--blue);
+        box-shadow: inset 0 0 0 2px rgba(127, 159, 185, 0.14);
+      }
+
       .sr-only {
         position: absolute;
         width: 1px;
@@ -753,9 +820,64 @@
           class="sr-only"
           type="file"
           id="importFile"
-          accept="application/json,.json"
+          accept="application/json,.json,.txt,text/plain"
         />
       </section>
+
+        <div
+          class="modal-backdrop"
+          id="dataChoiceModal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dataChoiceTitle"
+        >
+          <section class="modal-card">
+            <h2 id="dataChoiceTitle">File or Text</h2>
+            <p id="dataChoiceHelp">
+              Choose whether you want to use a normal JSON file or paste/copy the note data as text.
+            </p>
+            <div class="modal-actions">
+              <button class="tool-btn" type="button" id="dataChoiceFile">
+                File
+              </button>
+              <button class="tool-btn" type="button" id="dataChoiceText">
+                Text
+              </button>
+              <button class="tool-btn" type="button" id="dataChoiceCancel">
+                Cancel
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <div
+          class="modal-backdrop"
+          id="textDataModal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="textDataTitle"
+        >
+          <section class="modal-card">
+            <h2 id="textDataTitle">Text Data</h2>
+            <p id="textDataHelp"></p>
+            <textarea
+              class="modal-textarea"
+              id="textDataBox"
+              spellcheck="false"
+            ></textarea>
+            <div class="modal-actions">
+              <button class="tool-btn" type="button" id="textDataPrimary">
+                Import
+              </button>
+              <button class="tool-btn" type="button" id="textDataCopy">
+                Copy
+              </button>
+              <button class="tool-btn" type="button" id="textDataClose">
+                Close
+              </button>
+            </div>
+          </section>
+        </div>
 
       <section class="split-notes" aria-label="Two note taking systems">
         <article class="notes-card" aria-label="Left note taking system">
@@ -845,6 +967,19 @@
       const importButton = document.getElementById("importData");
       const importFile = document.getElementById("importFile");
       const saveStatus = document.getElementById("saveStatus");
+      const dataChoiceModal = document.getElementById("dataChoiceModal");
+      const dataChoiceTitle = document.getElementById("dataChoiceTitle");
+      const dataChoiceHelp = document.getElementById("dataChoiceHelp");
+      const dataChoiceFile = document.getElementById("dataChoiceFile");
+      const dataChoiceText = document.getElementById("dataChoiceText");
+      const dataChoiceCancel = document.getElementById("dataChoiceCancel");
+      const textDataModal = document.getElementById("textDataModal");
+      const textDataTitle = document.getElementById("textDataTitle");
+      const textDataHelp = document.getElementById("textDataHelp");
+      const textDataBox = document.getElementById("textDataBox");
+      const textDataPrimary = document.getElementById("textDataPrimary");
+      const textDataCopy = document.getElementById("textDataCopy");
+      const textDataClose = document.getElementById("textDataClose");
 
       const labels = {
         1: "1. Category",
@@ -860,6 +995,7 @@
       let isRestoringHistory = false;
       let historyTimer = null;
       let saveStatusTimer = null;
+      let currentDataAction = null;
 
       function applyTheme(theme) {
         const nextTheme = theme === "light" ? "light" : "dark";
@@ -1276,13 +1412,17 @@
         if (nextFocus) focusText(nextFocus);
       }
 
-      function exportData() {
-        const payload = {
+      function getExportPayload() {
+        return {
           version: 5,
           exportedAt: new Date().toISOString(),
           theme: document.documentElement.dataset.theme || "dark",
           boards: getAllBoardsData(),
         };
+      }
+
+      function exportDataFile() {
+        const payload = getExportPayload();
         const blob = new Blob([JSON.stringify(payload, null, 2)], {
           type: "application/json",
         });
@@ -1296,6 +1436,66 @@
         URL.revokeObjectURL(url);
       }
 
+
+      function openDataChoice(action) {
+        currentDataAction = action;
+        const isExport = action === "export";
+        dataChoiceTitle.textContent = isExport
+          ? "Export: File or Text"
+          : "Import: File or Text";
+        dataChoiceHelp.textContent = isExport
+          ? "Export to a normal JSON file, or show the same data as text you can copy."
+          : "Import from a normal JSON or TXT file, or paste the note data directly as text.";
+        dataChoiceFile.textContent = "File";
+        dataChoiceText.textContent = "Text";
+        dataChoiceModal.classList.add("is-open");
+        dataChoiceFile.focus();
+      }
+
+      function closeDataChoice() {
+        dataChoiceModal.classList.remove("is-open");
+        currentDataAction = null;
+      }
+
+      function openTextData(action, value = "") {
+        const isExport = action === "export";
+        textDataTitle.textContent = isExport ? "Export Text" : "Import Text";
+        textDataHelp.textContent = isExport
+          ? "Copy this text and save it anywhere. You can paste it back later with Import → Text."
+          : "Paste note data here, then click Import. JSON from Export → Text or Export → File both work.";
+        textDataBox.value = value;
+        textDataBox.readOnly = isExport;
+        textDataPrimary.textContent = isExport ? "Done" : "Import";
+        textDataCopy.hidden = !isExport;
+        textDataModal.classList.add("is-open");
+        textDataBox.focus();
+        if (isExport) textDataBox.select();
+      }
+
+      function closeTextData() {
+        textDataModal.classList.remove("is-open");
+        textDataBox.value = "";
+      }
+
+      function importDataFromText(textValue) {
+        try {
+          const parsed = JSON.parse(String(textValue || "{}"));
+          const importedBoards = normalizeImport(parsed);
+          if (parsed.theme === "light" || parsed.theme === "dark")
+            applyTheme(parsed.theme);
+          boards.forEach((board) => {
+            const rows = importedBoards[board.dataset.board];
+            if (Array.isArray(rows)) renderBoard(board, rows, false);
+          });
+          saveAllBoards(true);
+          recordHistoryNow();
+          alert("Imported note data successfully.");
+          closeTextData();
+        } catch (error) {
+          alert(error.message || "Could not import that text.");
+        }
+      }
+
       function normalizeImport(parsed) {
         if (parsed?.boards && typeof parsed.boards === "object")
           return parsed.boards;
@@ -1307,23 +1507,12 @@
       function importDataFile(file) {
         const reader = new FileReader();
         reader.onload = () => {
-          try {
-            const parsed = JSON.parse(String(reader.result || "{}"));
-            const importedBoards = normalizeImport(parsed);
-            if (parsed.theme === "light" || parsed.theme === "dark")
-              applyTheme(parsed.theme);
-            boards.forEach((board) => {
-              const rows = importedBoards[board.dataset.board];
-              if (Array.isArray(rows)) renderBoard(board, rows, false);
-            });
-            saveAllBoards(true);
-            recordHistoryNow();
-            alert("Imported note data successfully.");
-          } catch (error) {
-            alert(error.message || "Could not import that file.");
-          } finally {
-            importFile.value = "";
-          }
+          importDataFromText(reader.result);
+          importFile.value = "";
+        };
+        reader.onerror = () => {
+          alert("Could not read that file.");
+          importFile.value = "";
         };
         reader.readAsText(file);
       }
@@ -1440,8 +1629,62 @@
       });
 
       themeToggle.addEventListener("click", toggleTheme);
-      exportButton.addEventListener("click", exportData);
-      importButton.addEventListener("click", () => importFile.click());
+      exportButton.addEventListener("click", () => openDataChoice("export"));
+      importButton.addEventListener("click", () => openDataChoice("import"));
+
+      dataChoiceFile.addEventListener("click", () => {
+        const action = currentDataAction;
+        closeDataChoice();
+        if (action === "export") exportDataFile();
+        if (action === "import") importFile.click();
+      });
+
+      dataChoiceText.addEventListener("click", () => {
+        const action = currentDataAction;
+        closeDataChoice();
+        if (action === "export")
+          openTextData("export", JSON.stringify(getExportPayload(), null, 2));
+        if (action === "import") openTextData("import");
+      });
+
+      dataChoiceCancel.addEventListener("click", closeDataChoice);
+
+      textDataPrimary.addEventListener("click", () => {
+        if (textDataBox.readOnly) closeTextData();
+        else importDataFromText(textDataBox.value);
+      });
+
+      textDataCopy.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(textDataBox.value);
+          textDataCopy.textContent = "Copied";
+          setTimeout(() => {
+            textDataCopy.textContent = "Copy";
+          }, 900);
+        } catch {
+          textDataBox.focus();
+          textDataBox.select();
+          alert("Select the text and copy it manually.");
+        }
+      });
+
+      textDataClose.addEventListener("click", closeTextData);
+
+      [dataChoiceModal, textDataModal].forEach((modal) => {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) {
+            if (modal === dataChoiceModal) closeDataChoice();
+            if (modal === textDataModal) closeTextData();
+          }
+        });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        closeDataChoice();
+        closeTextData();
+      });
+
       importFile.addEventListener("change", () => {
         const file = importFile.files?.[0];
         if (file) importDataFile(file);
