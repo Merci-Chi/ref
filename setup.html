@@ -1473,8 +1473,9 @@
       function moveDraggedBlock(targetRow, position) {
         if (!draggedBlockRow || !targetRow || draggedBlockRow === targetRow) return;
 
-        const board = draggedBlockRow.closest(".notes");
-        if (!board || targetRow.closest(".notes") !== board) return;
+        const sourceBoard = draggedBlockRow.closest(".notes");
+        const targetBoard = targetRow.closest(".notes");
+        if (!sourceBoard || !targetBoard) return;
 
         const draggedRows = getBlockRows(draggedBlockRow);
         if (draggedRows.includes(targetRow)) return;
@@ -1523,10 +1524,19 @@
           setChildrenOpen(targetRow, true, false);
         }
 
-        updateChildControls(board);
-        applyChildVisibility(board);
+        updateChildControls(sourceBoard);
+        applyChildVisibility(sourceBoard);
+        updateChildControls(targetBoard);
+        applyChildVisibility(targetBoard);
+
         selectBlock(draggedBlockRow);
-        saveBoard(board);
+
+        if (sourceBoard === targetBoard) {
+          saveBoard(targetBoard);
+        } else {
+          saveBoard(sourceBoard);
+          saveBoard(targetBoard);
+        }
       }
 
       function allowedLevelForRow(row, requestedLevel) {
@@ -1990,18 +2000,23 @@
 
       boards.forEach((board) => {
         board.addEventListener("dragover", (event) => {
-          if (!draggedBlockRow || draggedBlockRow.closest(".notes") !== board) return;
+          if (!draggedBlockRow) return;
+
           const dropInfo = findDropTarget(event, board);
           if (!dropInfo || getBlockRows(draggedBlockRow).includes(dropInfo.targetRow)) return;
+
           event.preventDefault();
           event.dataTransfer.dropEffect = "move";
           updateDropMarker(dropInfo.targetRow, dropInfo.position);
         });
 
         board.addEventListener("drop", (event) => {
-          if (!draggedBlockRow || draggedBlockRow.closest(".notes") !== board) return;
+          if (!draggedBlockRow) return;
+
           const targetRow = currentDropTarget;
           const position = currentDropPosition;
+          if (!targetRow || targetRow.closest(".notes") !== board) return;
+
           event.preventDefault();
           clearDropMarkers();
           moveDraggedBlock(targetRow, position);
