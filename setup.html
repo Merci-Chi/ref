@@ -1157,7 +1157,14 @@
         row.querySelector(".say-text").textContent = say || "";
         row.querySelector(".ask-text").textContent = ask || "";
         setPitchOpen(row, Boolean(pitchOpen), false);
-        setChildrenOpen(row, childrenOpen !== false, false);
+        row.dataset.childrenOpen = childrenOpen !== false ? "true" : "false";
+        row.classList.toggle("has-collapsed-children", childrenOpen === false);
+        const childToggle = row.querySelector(".dropdown-toggle");
+        childToggle.setAttribute(
+          "aria-expanded",
+          childrenOpen !== false ? "true" : "false",
+        );
+        childToggle.textContent = childrenOpen !== false ? "▾" : "▸";
         updateCompletionMark(row);
         return row;
       }
@@ -1197,8 +1204,8 @@
       function setChildrenOpen(row, open, shouldSave = true) {
         if (!row) return;
         const board = row.closest(".notes");
-        updateChildControls(board);
-        if (!row.classList.contains("has-children")) open = true;
+        if (board) updateChildControls(board);
+        if (board && !row.classList.contains("has-children")) open = true;
         row.dataset.childrenOpen = open ? "true" : "false";
         row.classList.toggle("has-collapsed-children", !open);
         const toggle = row.querySelector(".dropdown-toggle");
@@ -1209,18 +1216,67 @@
           open ? "Collapse child notes" : "Expand child notes",
         );
         toggle.title = open ? "Collapse child notes" : "Expand child notes";
-        applyChildVisibility(board);
-        if (shouldSave) saveBoard(board);
+        if (board) applyChildVisibility(board);
+        if (shouldSave && board) saveBoard(board);
       }
 
       function lastNote(board) {
         return [...board.querySelectorAll(".note-row")].at(-1);
       }
 
+      function previousNote(row) {
+        let previous = row?.previousElementSibling;
+        while (previous && !previous.classList.contains("note-row")) {
+          previous = previous.previousElementSibling;
+        }
+        return previous || null;
+      }
+
+      function getDescendantRows(row) {
+        if (!row) return [];
+        const parentLevel = Number(row.dataset.level);
+        const descendants = [];
+        let next = row.nextElementSibling;
+        while (next?.classList.contains("note-row")) {
+          const nextLevel = Number(next.dataset.level);
+          if (nextLevel <= parentLevel) break;
+          descendants.push(next);
+          next = next.nextElementSibling;
+        }
+        return descendants;
+      }
+
+      function allowedLevelForRow(row, requestedLevel) {
+        const requested = safeLevel(requestedLevel);
+        const previous = previousNote(row);
+        const maxByPrevious = previous
+          ? Math.min(4, Number(previous.dataset.level) + 1)
+          : 1;
+        return Math.min(requested, maxByPrevious);
+      }
+
+      function setLevelWithDescendants(row, requestedLevel) {
+        if (!row) return;
+        const originalLevel = Number(row.dataset.level);
+        const nextLevel = allowedLevelForRow(row, requestedLevel);
+        const delta = nextLevel - originalLevel;
+        if (!delta) return;
+
+        const descendants = getDescendantRows(row);
+        setLevel(row, nextLevel, false);
+        descendants.forEach((descendant) => {
+          setLevel(descendant, Number(descendant.dataset.level) + delta, false);
+        });
+        saveBoard(row.closest(".notes"));
+      }
+
+      function nextLevelAfterEnter(row) {
+        const level = Number(row.dataset.level);
+        return level === 1 ? 2 : level;
+      }
+
       function addRowAtBottom(board) {
-        const previous = lastNote(board);
-        const level = previous ? Number(previous.dataset.level) : 1;
-        const newRow = makeNote(level);
+        const newRow = makeNote(1);
         board.querySelector(".add-row").before(newRow);
         saveBoard(board);
         focusText(newRow);
@@ -1559,23 +1615,19 @@
         const isLabel = event.target.classList.contains("note-label");
         const isDeleteKey = event.key === "Delete" || event.key === "Backspace";
 
-        if ((isText || isExtra || isLabel) && isDeleteKey && event.metaKey) {
+        if (
+          (isText || isExtra || isLabel) &&
+          isDeleteKey &&
+          (event.ctrlKey || event.metaKey || event.shiftKey)
+        ) {
           event.preventDefault();
           deleteRow(row);
           return;
         }
 
-        if ((isText || isExtra || isLabel) && isDeleteKey && event.shiftKey) {
-          event.preventDefault();
-          setLevel(row, level - 1);
-          if (isText) focusText(row);
-          if (isExtra) focusEditable(row.querySelector(".extra-text"));
-          return;
-        }
-
         if (isText && event.key === "Enter") {
           event.preventDefault();
-          const newRow = makeNote(level);
+          const newRow = makeNote(nextLevelAfterEnter(row));
           insertAfter(newRow, row);
           focusText(newRow);
           return;
@@ -1583,7 +1635,7 @@
 
         if ((isText || isExtra || isLabel) && event.key === "Tab") {
           event.preventDefault();
-          setLevel(row, event.shiftKey ? level - 1 : level + 1);
+          setLevelWithDescendants(row, event.shiftKey ? level - 1 : level + 1);
           if (isText) focusText(row);
           if (isExtra) focusEditable(row.querySelector(".extra-text"));
           return;
@@ -1591,7 +1643,7 @@
 
         if (isLabel && event.key === "Enter") {
           event.preventDefault();
-          const newRow = makeNote(level);
+          const newRow = makeNote(nextLevelAfterEnter(row));
           insertAfter(newRow, row);
           focusText(newRow);
         }
