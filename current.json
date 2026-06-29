@@ -1,6 +1,6 @@
-{
+\{
   "version": 5,
-  "exportedAt": "2026-06-29T04:35:31.982Z",
+  "exportedAt": "2026-06-29T04:36:25.850Z",
   "theme": "dark",
   "boards": {
     "left": [
@@ -181,7 +181,7 @@
         "level": 2,
         "text": "Domain !!!",
         "say": "Of course. For domains, I can help you figure out where it’s registered, make sure you have access, connect it to your website, update DNS settings, or help with the transfer process. I’ll always make sure the domain stays under your ownership.",
-        "ask": "Do you know where your domain is registered, like GoDaddy, Squarespace, Wix, Namecheap, or somewhere else?",
+        "ask": "Do you know where your domain is registered, like Squarespace, Wix, Namecheap, or somewhere else?",
         "pitchOpen": true,
         "childrenOpen": true,
         "open": true
