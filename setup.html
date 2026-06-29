@@ -1817,25 +1817,57 @@
         textDataModal.classList.remove("is-open");
         textDataBox.value = "";
       }
+      function normalizeRowForComparison(row) {
+  return JSON.stringify({
+    level: safeLevel(row.level),
+    text: String(row.text || "").trim(),
+    say: String(row.say ?? row.extra ?? "").trim(),
+    ask: String(row.ask || "").trim(),
+  });
+}
 
+function mergeUniqueRows(existingRows, importedRows) {
+  const seen = new Set(existingRows.map(normalizeRowForComparison));
+  const mergedRows = [...existingRows];
+
+  importedRows.forEach((row) => {
+    const key = normalizeRowForComparison(row);
+
+    if (!seen.has(key)) {
+      mergedRows.push(row);
+      seen.add(key);
+    }
+  });
+
+  return mergedRows;
+}
       function importDataFromText(textValue) {
-        try {
-          const parsed = JSON.parse(String(textValue || "{}"));
-          const importedBoards = normalizeImport(parsed);
-          if (parsed.theme === "light" || parsed.theme === "dark")
-            applyTheme(parsed.theme);
-          boards.forEach((board) => {
-            const rows = importedBoards[board.dataset.board];
-            if (Array.isArray(rows)) renderBoard(board, rows, false);
-          });
-          saveAllBoards(true);
-          recordHistoryNow();
-          alert("Imported note data successfully.");
-          closeTextData();
-        } catch (error) {
-          alert(error.message || "Could not import that text.");
-        }
+  try {
+    const parsed = JSON.parse(String(textValue || "{}"));
+    const importedBoards = normalizeImport(parsed);
+
+    if (parsed.theme === "light" || parsed.theme === "dark") {
+      applyTheme(parsed.theme);
+    }
+
+    boards.forEach((board) => {
+      const importedRows = importedBoards[board.dataset.board];
+
+      if (Array.isArray(importedRows)) {
+        const existingRows = getBoardData(board);
+        const mergedRows = mergeUniqueRows(existingRows, importedRows);
+        renderBoard(board, mergedRows, false);
       }
+    });
+
+    saveAllBoards(true);
+    recordHistoryNow();
+    alert("Imported note data successfully.");
+    closeTextData();
+  } catch (error) {
+    alert(error.message || "Could not import that text.");
+  }
+}
 
       function normalizeImport(parsed) {
         if (parsed?.boards && typeof parsed.boards === "object")
