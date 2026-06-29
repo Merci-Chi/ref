@@ -1,6 +1,6 @@
-\{
+{
   "version": 5,
-  "exportedAt": "2026-06-29T04:36:25.850Z",
+  "exportedAt": "2026-06-29T04:35:00.000Z",
   "theme": "dark",
   "boards": {
     "left": [
@@ -24,63 +24,36 @@
       },
       {
         "level": 1,
-        "text": "Access / Security",
-        "say": "Of course — you stay in control of your accounts, files, and information. I’m just here to help take work off your plate, and I’ll only access what you’re comfortable sharing.",
-        "ask": "What would I need access to so I can help you properly?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Will I have access?",
-        "say": "Yeah absolutely. You’ll still own and control everything. I’m just here to help lessen the workload, and I’ll only have access to what you allow me to access.",
-        "ask": "Would you rather add me as a helper/collaborator, or would you prefer to keep everything under your login and send things over as needed?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Can I make updates?",
-        "say": "Yeah absolutely. My goal is to make things easier for you, not make you dependent on me for every little change. I can either handle updates for you or show you how to make simple updates yourself.",
-        "ask": "Would you rather I handle updates for you, or would you like to be able to make small changes on your own too?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Login Access?",
-        "say": "Yeahh I gotcha. For anything that needs login access, I’ll only use what you choose to share with me. If possible, I prefer safer options like being added as a user, setting permissions, or using a password manager instead of sending passwords directly.",
-        "ask": "Do you want to add me as a user, or would you rather use a password manager or limited-access option?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "How do you protect confidential information?",
-        "say": "Of course. I treat your information with care and keep things confidential. I only access what I actually need for the task, and I don’t share your files, passwords, client info, or business details.",
-        "ask": "Is there anything extra sensitive that you want handled a certain way?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Sync Calendar",
-        "say": "Yeah absolutely. I can help organize, update, or sync your calendar depending on what you need. I can help with appointments, reminders, deadlines, scheduling, and making sure important dates don’t get missed.",
-        "ask": "Are you trying to clean up your current calendar, sync it with something else, or have help managing it going forward?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 1,
         "text": "Services",
         "say": "Of course — admin support can be flexible depending on what’s taking up your time. The goal is to help with the behind-the-scenes work so things feel smoother and easier to manage.",
         "ask": "What’s been taking up the most time or feeling the most overwhelming lately?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "What is included in your admin support packages?",
+        "say": "Of course. It depends on the package, but admin support can include inbox help, calendar support, documents, file organization, client follow-ups, task tracking, forms, templates, and general backend support. We can shape it around what you actually need.",
+        "ask": "Are you looking for help with a few specific things, or more overall backend support?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "One Time or Ongoing?",
+        "say": "Of course. I offer both one-time and ongoing support. If you just need help with one project, we can do that. If you need consistent help staying organized, ongoing support may be the better fit.",
+        "ask": "Are you looking for help with one specific project, or do you need support every week or month?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Can I change or cancel my package?",
+        "say": "Yeah absolutely. I understand that your needs can change, so we can adjust your support if you need more or less help. I’ll always communicate clearly about timelines, boundaries, and any changes.",
+        "ask": "Would you prefer something flexible month-to-month, or a more consistent support plan?",
         "pitchOpen": true,
         "childrenOpen": true,
         "open": true
@@ -104,37 +77,10 @@
         "open": true
       },
       {
-        "level": 2,
-        "text": "What is included in your admin support packages?",
-        "say": "Of course. It depends on the package, but admin support can include inbox help, calendar support, documents, file organization, client follow-ups, task tracking, forms, templates, and general backend support. We can shape it around what you actually need.",
-        "ask": "Are you looking for help with a few specific things, or more overall backend support?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Can I change or cancel my package?",
-        "say": "Yeah absolutely. I understand that your needs can change, so we can adjust your support if you need more or less help. I’ll always communicate clearly about timelines, boundaries, and any changes.",
-        "ask": "Would you prefer something flexible month-to-month, or a more consistent support plan?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
         "level": 3,
         "text": "Client Communication/Follow-ups",
         "say": "Yeah absolutely. I can help with client communication and follow-ups, like reminders, check-ins, appointment confirmations, collecting missing info, or helping keep conversations organized and consistent.",
         "ask": "Would you want to approve messages first, or are you comfortable with me sending routine follow-ups once we agree on the tone?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "One Time or Ongoing?",
-        "say": "Of course. I offer both one-time and ongoing support. If you just need help with one project, we can do that. If you need consistent help staying organized, ongoing support may be the better fit.",
-        "ask": "Are you looking for help with one specific project, or do you need support every week or month?",
         "pitchOpen": true,
         "childrenOpen": true,
         "open": true
@@ -150,65 +96,18 @@
       },
       {
         "level": 2,
+        "text": "Sync Calendar",
+        "say": "Yeah absolutely. I can help organize, update, or sync your calendar depending on what you need. I can help with appointments, reminders, deadlines, scheduling, and making sure important dates don’t get missed.",
+        "ask": "Are you trying to clean up your current calendar, sync it with something else, or have help managing it going forward?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
         "text": "How do we get started?",
         "say": "Yeahh, we’ll start by talking through what you need help with, what feels overwhelming, and what systems you already use. From there, I’ll help make a simple plan so we know what to handle first.",
         "ask": "What would you like taken off your plate first?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      }
-    ],
-    "right": [
-      {
-        "level": 1,
-        "text": "Migration",
-        "say": "Yeahh, migration can sound stressful, but it’s really just moving things from one place to another in an organized way. I can help with websites, domains, files, content, and systems so it feels less overwhelming.",
-        "ask": "What are you trying to move, and where is it currently?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Website",
-        "say": "Yeahh I gotcha. If you’re using something like Wix, Squarespace, or another website builder, it may be better to recreate the site on the new platform instead of trying to directly transfer it. Some platforms don’t give full access to export everything, but I can still help move the content, organize the pages, and rebuild it manually if needed.",
-        "ask": "What platform is your website on now, and where are you trying to move it?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Domain !!!",
-        "say": "Of course. For domains, I can help you figure out where it’s registered, make sure you have access, connect it to your website, update DNS settings, or help with the transfer process. I’ll always make sure the domain stays under your ownership.",
-        "ask": "Do you know where your domain is registered, like Squarespace, Wix, Namecheap, or somewhere else?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 1,
-        "text": "ROI",
-        "say": "Yeahh, that makes sense to think about. ROI is really about whether this support saves you time, lowers stress, helps you stay organized, and gives you more room to focus on the work that actually matters.",
-        "ask": "What would make this feel worth it to you — saving time, getting organized, getting more clients, or feeling less overwhelmed?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "How do I measure?",
-        "say": "Yeah, that’s a great question. We can measure ROI by looking at how much time you’re saving, how many tasks are getting done consistently, how much smoother your client experience feels, and whether you’re able to focus more on work that brings in money.",
-        "ask": "Would you want to measure it by time saved, money saved, smoother operations, better client experience, or all of that?",
-        "pitchOpen": true,
-        "childrenOpen": true,
-        "open": true
-      },
-      {
-        "level": 2,
-        "text": "Is this really worth it?",
-        "say": "Yeahh I completely get why you’d ask that. Before you invest in support, we can look at what’s taking up your time, what’s slowing you down, and what you’d be able to focus on if those tasks were handled for you. That usually makes the value a lot clearer.",
-        "ask": "What could I take off your plate that would make this feel the most valuable for you?",
         "pitchOpen": true,
         "childrenOpen": true,
         "open": true
@@ -233,18 +132,119 @@
       },
       {
         "level": 2,
-        "text": "How do you prioritize tasks?",
-        "say": "Yeahh, I usually prioritize based on deadlines, urgency, impact, and what will make the biggest difference first. If something is time-sensitive, just let me know and I’ll organize the workload around that.",
-        "ask": "When you send tasks, do you usually know what’s urgent, or would you want me to help sort the priorities?",
+        "text": "What happens after I submit a task request?",
+        "say": "Of course. Once you send a task request, I’ll look over what’s needed, ask for anything missing, confirm the priority or deadline if needed, and then get started. If something isn’t clear, I’ll check with you before moving forward.",
+        "ask": "Do you want updates along the way, or would you rather get a summary once the task is finished?",
         "pitchOpen": true,
         "childrenOpen": true,
         "open": true
       },
       {
         "level": 2,
-        "text": "What happens after I submit a task request?",
-        "say": "Of course. Once you send a task request, I’ll look over what’s needed, ask for anything missing, confirm the priority or deadline if needed, and then get started. If something isn’t clear, I’ll check with you before moving forward.",
-        "ask": "Do you want updates along the way, or would you rather get a summary once the task is finished?",
+        "text": "How do you prioritize tasks?",
+        "say": "Yeahh, I usually prioritize based on deadlines, urgency, impact, and what will make the biggest difference first. If something is time-sensitive, just let me know and I’ll organize the workload around that.",
+        "ask": "When you send tasks, do you usually know what’s urgent, or would you want me to help sort the priorities?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      }
+    ],
+    "right": [
+      {
+        "level": 1,
+        "text": "Access / Security",
+        "say": "Of course — you stay in control of your accounts, files, and information. I’m just here to help take work off your plate, and I’ll only access what you’re comfortable sharing.",
+        "ask": "What would I need access to so I can help you properly?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Will I have access?",
+        "say": "Yeah absolutely. You’ll still own and control everything. I’m just here to help lessen the workload, and I’ll only have access to what you allow me to access.",
+        "ask": "Would you rather add me as a helper/collaborator, or would you prefer to keep everything under your login and send things over as needed?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Login Access?",
+        "say": "Yeahh I gotcha. For anything that needs login access, I’ll only use what you choose to share with me. If possible, I prefer safer options like being added as a user, setting permissions, or using a password manager instead of sending passwords directly.",
+        "ask": "Do you want to add me as a user, or would you rather use a password manager or limited-access option?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Can I make updates?",
+        "say": "Yeah absolutely. My goal is to make things easier for you, not make you dependent on me for every little change. I can either handle updates for you or show you how to make simple updates yourself.",
+        "ask": "Would you rather I handle updates for you, or would you like to be able to make small changes on your own too?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "How do you protect confidential information?",
+        "say": "Of course. I treat your information with care and keep things confidential. I only access what I actually need for the task, and I don’t share your files, passwords, client info, or business details.",
+        "ask": "Is there anything extra sensitive that you want handled a certain way?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 1,
+        "text": "Migration",
+        "say": "Yeahh, migration can sound stressful, but it’s really just moving things from one place to another in an organized way. I can help with websites, domains, files, content, and systems so it feels less overwhelming.",
+        "ask": "What are you trying to move, and where is it currently?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Website",
+        "say": "Yeahh I gotcha. If you’re using something like Wix, Squarespace, or another website builder, it may be better to recreate the site on the new platform instead of trying to directly transfer it. Some platforms don’t give full access to export everything, but I can still help move the content, organize the pages, and rebuild it manually if needed.",
+        "ask": "What platform is your website on now, and where are you trying to move it?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Domain !!!",
+        "say": "Of course. For domains, I can help you figure out where it’s registered, make sure you have access, connect it to your website, update DNS settings, or help with the transfer process. I’ll always make sure the domain stays under your ownership.",
+        "ask": "Do you know where your domain is registered, like GoDaddy, Squarespace, Wix, Namecheap, or somewhere else?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 1,
+        "text": "ROI",
+        "say": "Yeahh, that makes sense to think about. ROI is really about whether this support saves you time, lowers stress, helps you stay organized, and gives you more room to focus on the work that actually matters.",
+        "ask": "What would make this feel worth it to you — saving time, getting organized, getting more clients, or feeling less overwhelmed?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Is this really worth it?",
+        "say": "Yeahh I completely get why you’d ask that. Before you invest in support, we can look at what’s taking up your time, what’s slowing you down, and what you’d be able to focus on if those tasks were handled for you. That usually makes the value a lot clearer.",
+        "ask": "What could I take off your plate that would make this feel the most valuable for you?",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "How do I measure?",
+        "say": "Yeah, that’s a great question. We can measure ROI by looking at how much time you’re saving, how many tasks are getting done consistently, how much smoother your client experience feels, and whether you’re able to focus more on work that brings in money.",
+        "ask": "Would you want to measure it by time saved, money saved, smoother operations, better client experience, or all of that?",
         "pitchOpen": true,
         "childrenOpen": true,
         "open": true
