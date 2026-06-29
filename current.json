@@ -1,1 +1,174 @@
 
+{
+  "version": 5,
+  "exportedAt": "2026-06-29T04:13:06.781Z",
+  "theme": "dark",
+  "boards": {
+    "left": [
+      {
+        "level": 1,
+        "text": "Time",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "How long does it take?",
+        "say": "\"It depends a bit on what you'd like me to do, let's put together a plan so I can get you a proper estimate\"",
+        "ask": "",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 1,
+        "text": "Access / Security",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Will I have access?",
+        "say": "\"Yes absolutely, you'll hold ownership over everything; I'm just here to lessen the workload. I'll only have access to what you allow me.\"",
+        "ask": "",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Can I make updates?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Login Access?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Protecting personal information",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Sync Calendar",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 1,
+        "text": "Services",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Documents/Forms/Templates",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 3,
+        "text": "Client Communication/Follow-ups",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "One Time or Ongoing?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      }
+    ],
+    "right": [
+      {
+        "level": 1,
+        "text": "Migration",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Website",
+        "say": "\"If you're using something like wix, it's probably best if I just recreate it, sites like those basically lock you into a contact because you don't have access to the data. I can still transfer all the data I'd probably just need to do it manually.\"",
+        "ask": "",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Domain !!!",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 1,
+        "text": "ROI",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "How do I measure?",
+        "say": "\"That's a great question.",
+        "ask": "",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      },
+      {
+        "level": 2,
+        "text": "Is this really worth it?",
+        "say": "\"I can help you to calculate it before we do anything, here let me pull up some of my references.\"",
+        "ask": "\"What do you think I can do that would make you feel like you get the most value out of your money?\"",
+        "pitchOpen": true,
+        "childrenOpen": true,
+        "open": true
+      }
+    ]
+  }
+}
