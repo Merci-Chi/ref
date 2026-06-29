@@ -1,7 +1,15 @@
+Note Taking System
+Tab indents · ⌘Z undo · Pitch opens Say / Ask
+Dark
+Export
+Import
+No file chosen
+Export Text
+Copy this text and save it anywhere. You can paste it back later with Import → Text.
 
 {
   "version": 5,
-  "exportedAt": "2026-06-29T04:13:06.781Z",
+  "exportedAt": "2026-06-29T04:18:42.640Z",
   "theme": "dark",
   "boards": {
     "left": [
@@ -19,9 +27,9 @@
         "text": "How long does it take?",
         "say": "\"It depends a bit on what you'd like me to do, let's put together a plan so I can get you a proper estimate\"",
         "ask": "",
-        "pitchOpen": true,
+        "pitchOpen": false,
         "childrenOpen": true,
-        "open": true
+        "open": false
       },
       {
         "level": 1,
@@ -37,9 +45,9 @@
         "text": "Will I have access?",
         "say": "\"Yes absolutely, you'll hold ownership over everything; I'm just here to lessen the workload. I'll only have access to what you allow me.\"",
         "ask": "",
-        "pitchOpen": true,
+        "pitchOpen": false,
         "childrenOpen": true,
-        "open": true
+        "open": false
       },
       {
         "level": 2,
@@ -61,7 +69,7 @@
       },
       {
         "level": 2,
-        "text": "Protecting personal information",
+        "text": "How do you protect confidential information?",
         "say": "",
         "ask": "",
         "pitchOpen": false,
@@ -96,6 +104,33 @@
         "open": false
       },
       {
+        "level": 2,
+        "text": "Can you help clean up and organize existing files or systems?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "What is included in your admin support packages?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Can I change or cancel my package?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
         "level": 3,
         "text": "Client Communication/Follow-ups",
         "say": "",
@@ -107,6 +142,24 @@
       {
         "level": 2,
         "text": "One Time or Ongoing?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "Can you support invoicing, billing, or basic bookkeeping tasks?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "How do we get started?",
         "say": "",
         "ask": "",
         "pitchOpen": false,
@@ -129,9 +182,9 @@
         "text": "Website",
         "say": "\"If you're using something like wix, it's probably best if I just recreate it, sites like those basically lock you into a contact because you don't have access to the data. I can still transfer all the data I'd probably just need to do it manually.\"",
         "ask": "",
-        "pitchOpen": true,
+        "pitchOpen": false,
         "childrenOpen": true,
-        "open": true
+        "open": false
       },
       {
         "level": 2,
@@ -156,19 +209,100 @@
         "text": "How do I measure?",
         "say": "\"That's a great question.",
         "ask": "",
-        "pitchOpen": true,
+        "pitchOpen": false,
         "childrenOpen": true,
-        "open": true
+        "open": false
       },
       {
         "level": 2,
         "text": "Is this really worth it?",
         "say": "\"I can help you to calculate it before we do anything, here let me pull up some of my references.\"",
         "ask": "\"What do you think I can do that would make you feel like you get the most value out of your money?\"",
-        "pitchOpen": true,
+        "pitchOpen": false,
         "childrenOpen": true,
-        "open": true
+        "open": false
+      },
+      {
+        "level": 1,
+        "text": "Communication",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "How do we communicate and send tasks to you?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "How do you prioritize tasks?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 2,
+        "text": "What happens after I submit a task request?",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
+      },
+      {
+        "level": 1,
+        "text": "",
+        "say": "",
+        "ask": "",
+        "pitchOpen": false,
+        "childrenOpen": true,
+        "open": false
       }
     ]
   }
 }
+Done
+Copy
+Close
+Left Board
+17 rows · 0 complete
+Time
+How long does it take?
+Access / Security
+Will I have access?
+Can I make updates?
+Login Access?
+How do you protect confidential information?
+Sync Calendar
+Services
+Documents/Forms/Templates
+Can you help clean up and organize existing files or systems?
+What is included in your admin support packages?
+Can I change or cancel my package?
+Client Communication/Follow-ups
+One Time or Ongoing?
+Can you support invoicing, billing, or basic bookkeeping tasks?
+How do we get started?
++
+Right Board
+11 rows · 1 complete
+Migration
+Website
+Domain !!!
+ROI
+How do I measure?
+Is this really worth it?
+Communication
+How do we communicate and send tasks to you?
+How do you prioritize tasks?
+What happens after I submit a task request?
++
